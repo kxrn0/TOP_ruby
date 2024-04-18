@@ -45,7 +45,7 @@ end
 def anime(gameState)
   while gameState[:isPlaying]
     if gameState[:lives] == 0
-      puts "Game Over. Ran out of lives."
+      puts "Game Over. Ran out of lives. The secret was #{gameState[:secret]}"
 
       playAgain = play_again?
 
