@@ -51,32 +51,86 @@ def legislators_by_zipcode(zip)
   end
 end
 
-def save_letter(id, form_letter)
-  Dir.mkdir "output" unless Dir.exist? "output"
+def save_file(dir, name, contents)
+  Dir.mkdir dir unless Dir.exist? dir
 
-  filename = "output/thanks_#{id}.html"
+  filename = "#{dir}/#{name}"
 
-  File.open(filename, "w") { |file| file.puts form_letter }
+  File.open(filename, "w") { |file| file.puts contents }
 end
 
-template_letter = File.read("form_letter.erb")
-erb_template = ERB.new template_letter
+def make_letter
+  template_letter = File.read "form_letter.erb"
+  erb_template = ERB.new template_letter
 
-contents = CSV.open(
-  "event_attendees.csv",
-  headers: true,
-  header_converters: :symbol,
-)
+  contents = CSV.open(
+    "event_attendees.csv",
+    headers: true,
+    header_converters: :symbol,
+  )
 
-Dir.mkdir "output" unless Dir.exist? "output"
+  contents.each do |row|
+    id = row[0]
+    name = row[:first_name]
+    phone = format_phone clean_phone row[:homephone]
+    zipcode = clean_zipcode row[:zipcode]
+    legislators = legislators_by_zipcode zipcode
+    form_letter = erb_template.result binding
+    dir = "output"
+    name = "thanks_#{id}.html"
 
-contents.each do |row|
-  id = row[0]
-  name = row[:first_name]
-  phone = format_phone clean_phone row[:homephone]
-  zipcode = clean_zipcode row[:zipcode]
-  legislators = legislators_by_zipcode zipcode
-  form_letter = erb_template.result binding
+    save_file dir, name, form_letter
+  end
 
-  save_letter id, form_letter
+  contents.close
 end
+
+def compute_average_time
+  contents = CSV.open(
+    "event_attendees.csv",
+    headers: true,
+    header_converters: :symbol,
+  )
+  lines = 0
+  average_time = 0
+  table = Array.new 24, 0
+
+  contents.each do |row|
+    parts = row[:regdate].split[1].split ":"
+    hours = parts[0].to_i
+    minutes = hours * 60 + parts[1].to_i
+
+    table[hours] += 1
+    average_time += minutes
+    lines += 1
+  end
+
+  begin
+    average_time /= lines
+    hours = (average_time / 60).to_s.rjust 2, "0"
+    minutes = (average_time % 60).to_s.rjust 2, "0"
+    time = "#{hours}:#{minutes}"
+
+    { table: table, time: time }
+  rescue
+    nil
+  end
+end
+
+def get_most_active_hours
+  average = compute_average_time
+
+  return unless average
+
+  template_log = File.read "time.erb"
+  erb_template = ERB.new template_log
+  log = erb_template.result binding
+  dir = "logs"
+  name = "time.csv"
+
+  save_file dir, name, log
+end
+
+get_most_active_hours
+
+# make_letter

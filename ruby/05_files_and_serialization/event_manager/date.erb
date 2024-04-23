@@ -1,0 +1,4 @@
+# average registration day: <%= average[:day] %>
+
+day,registered<% average[:table] do |day, people| %>
+<%= day %>,<%= people %><% end %>

@@ -1,0 +1,4 @@
+# average registration time: <%= average[:time] %>
+
+hour,registered<% average[:table].each_with_index do |people, index| %>
+<%= index %>,<%= people %><% end %>
