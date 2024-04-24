@@ -1,4 +1,2 @@
-# average registration day: <%= average[:day] %>
-
-day,registered<% average[:table] do |day, people| %>
-<%= day %>,<%= people %><% end %>
+day,registered<% count.each do |day, registered| %>
+<%= day %>,<%= registered %><% end %>

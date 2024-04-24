@@ -131,6 +131,39 @@ def get_most_active_hours
   save_file dir, name, log
 end
 
-get_most_active_hours
+def find_day_count
+  contents = CSV.open(
+    "event_attendees.csv",
+    headers: true,
+    header_converters: :symbol,
+  )
+
+  days = {}
+  Date::DAYNAMES.each { |day| days[day] = 0 }
+
+  contents.each do |row|
+    reg_date = row[:regdate].split[0]
+    date = Date.strptime reg_date, "%m/%d/%y"
+
+    days[Date::DAYNAMES[date.wday]] += 1
+  end
+
+  days
+end
+
+def get_most_active_days
+  count = find_day_count
+  template_log = File.read "date.erb"
+  erb_template = ERB.new template_log
+  log = erb_template.result binding
+  dir = "logs"
+  name = "date.csv"
+
+  save_file dir, name, log
+end
+
+# get_most_active_days
+
+# get_most_active_hours
 
 # make_letter
