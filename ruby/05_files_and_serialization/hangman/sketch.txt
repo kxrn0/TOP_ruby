@@ -1,0 +1,17 @@
+How should I approach this? There are two main parts to the project; coding the game logic, and the logic for saving and loading previous games.
+
+I think I should first code the game logic, and once it's done I'll do the saving part.
+
+_____
+|   |
+|   O
+|  /|\
+|  / \
+|
+_.r._.g.r.a._
+
+When the game loads the computer selects a random word from a dictionary. Then we enter a loop where we guess characters until we win or we run out of turns. Once we run out, the computer asks the user if they want to play again. If they say yes, then the cycle repeats, otherwise the program stops.
+
+What variables do we need to keep track of? We need to keep track of the secret word, also of the current number of remaining turns. The initial number of turns as a constant may also prove to be useful when resetting the game. We also need to keep track of the correct guesses. Given that it would be more convenient to know how many mistakes the user has made to draw the stick figure, maybe we should have a variable for that rather than for the remaining turns. Then the game will be over once the number of mistakes, which starts at zero, is equal to the max number of mistakes possible.
+
+How do we keep track of the correct guesses? I think we should use an array of characters. If the word is "aabcab", we would initially render "_._._._._._". If the user types "a", then since that character is in the secret, we store it in the array of correct guesses and render "a.a._._.a._"
