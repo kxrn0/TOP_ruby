@@ -5,7 +5,6 @@ class Game
   def initialize
     @state = { max_mistakes: 7 }
     @is_on = true
-    @options = ["help", "new", "load", "end", "save", "exit"]
   end
 
   def init_state
@@ -23,20 +22,9 @@ class Game
       if choices.include? input
         return input
       else
-        puts "Invalid input!"
+        puts "Invalid input! Try again!"
       end
     end
-  end
-
-  def print_help
-    puts "
-      help -> help
-      new -> new game
-      load -> load game
-      end -> end game
-      save -> save game
-      exit -> exit
-    "
   end
 
   def sanitize(filename)
@@ -68,9 +56,15 @@ class Game
 
   def get_guess
     bad_input = true
+    help = "
+      help -> Print help
+      end -> End current game
+      save -> Save current game
+      exit -> Exit
+    "
 
     while bad_input
-      print "Enter guess, or a menu option: "
+      print "Enter guess, or 'help' for options: "
       input = gets.chomp.downcase
 
       if input.size == 1
@@ -78,17 +72,13 @@ class Game
           @state[:hits].push input
         else
           @state[:mistakes] += 1
-        end        
-        
+        end
+
         bad_input = false
       else
         case input
         when "help"
-          print_help
-        when "new"
-          puts "Can't start a new game while one is in progress!"
-        when "load"
-          puts "Can't load game while one is in progress!"
+          puts help
         when "end"
           puts "Terminating current game..."
           @state[:is_playing] = false
@@ -134,6 +124,16 @@ class Game
     puts text
   end
 
+  def play_again
+    input = get_input "Play again (yes / no)?: ", ["yes", "no"]
+
+    if input == "yes"
+      init_state
+    elsif input == "no"
+      @state[:is_playing] = false
+    end
+  end
+
   def play
     while @state[:is_playing]
       print_board
@@ -143,6 +143,7 @@ class Game
         play_again
       elsif @state[:secret].all? { |char| @state[:hits].include? char }
         puts "You win!"
+        play_again
       else
         get_guess
       end
@@ -170,7 +171,7 @@ class Game
 
   def remove_line(text, filename)
     ext = filename.split "."[-1]
-    temp_name = "#{Time.now.to_f._to_s}.#{ext}"
+    temp_name = "#{Time.now.to_f.to_s}.#{ext}"
 
     File.open(temp_name, "w") do |temp|
       File.foreach(filename) do |line|
@@ -200,12 +201,12 @@ class Game
     game_list = []
     File.foreach("gme.txt") { |line| game_list.push line.chomp }
 
-    game_list.each_with_index do |name, index|
-      puts "#{index + 1} - #{name}"
-    end
-
     bad_input = true
     while bad_input
+      game_list.each_with_index do |name, index|
+        puts "#{index + 1} - #{name}"
+      end
+
       print "Enter the index of a game, or 'menu' to go back: "
       index = get_number 1, game_list.size, "menu"
 
@@ -214,14 +215,22 @@ class Game
       end
 
       index -= 1
-      exists = File.exist? "games/#{game_list[index]}"
+      name = game_list[index]
+      filename = "games/#{name}"
+      exists = File.exist? filename
 
       unless exists
         delete_record game_list, index, "Game not found! Try another one!"
       else
-        filename = "games/#{game_list[index]}"
-        file = File.open filename
-        data = JSON.parse file.read
+        begin
+          file = File.open filename
+          data = JSON.parse file.read
+        rescue
+          File.delete filename
+          delete_record game_list, index, "File corrupted! Try a different one!"
+
+          next
+        end
 
         if data["secret"].class == Array &&
            data["mistakes"].class == Integer &&
@@ -235,11 +244,9 @@ class Game
             @state[:hits] = data["hits"]
             @state[:is_playing] = true
             bad_input = false
+            play
           when "delete"
-            name = game_list[index]
-            filename = "games/#{name}"
-
-            File.delete filename if File.exist? filename
+            File.delete filename
             delete_record game_list, index, "Game deleted."
           when "menu"
             bad_input = false
@@ -254,11 +261,18 @@ class Game
   end
 
   def start
+    help = "
+      help -> Print help
+      new -> New Game!
+      load -> Load game
+      exit -> Exit
+    "
+
     while @is_on
       puts "Instructions:"
-      print_help
+      puts help
 
-      option = get_input "Enter option: ", @options
+      option = get_input "Enter option: ", ["help", "new", "load", "exit"]
 
       case option
       when "new"
@@ -266,10 +280,6 @@ class Game
         play
       when "load"
         load_game
-      when "end"
-        puts "Nothing to end."
-      when "save"
-        puts "Nothing to save"
       when "exit"
         @is_on = false
       end
