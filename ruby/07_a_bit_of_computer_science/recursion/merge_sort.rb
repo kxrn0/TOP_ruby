@@ -1,9 +1,3 @@
-=begin
-  array = [4, 7, 2, 8, 1, 9, 3, 6, 5]
-
-
-=end
-
 def merge a, b
   merged = []
   aIndex = 0
