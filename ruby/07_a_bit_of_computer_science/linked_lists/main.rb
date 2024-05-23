@@ -3,13 +3,12 @@ class List
     @head = nil
   end
 
-  def append data
+  def append(data)
     node = Node.new data, nil
-    
-    unless @head
 
+    unless @head
       @head = node
-      
+
       return
     end
 
@@ -21,13 +20,13 @@ class List
 
     temp.next_node = node
   end
-  
-  def prepend data
+
+  def prepend(data)
     node = Node.new data, @head
 
     @head = node
   end
-  
+
   def size
     return 0 unless @head
 
@@ -46,7 +45,7 @@ class List
   def head
     @head
   end
-  
+
   def tail
     return @head unless @head
 
@@ -58,8 +57,8 @@ class List
 
     temp
   end
-  
-  def at index
+
+  def at(index)
     current = 0
     temp = @head
 
@@ -67,9 +66,9 @@ class List
       break if current == index
 
       temp = temp.next_node
-      current += 1  
+      current += 1
     end
-    
+
     raise "Index out of bounds!" if current < index
 
     temp
@@ -77,7 +76,15 @@ class List
 
   def pop
     raise "List is empty!" unless @head
-    
+
+    unless @head.next_node
+      node = @head
+
+      @head = nil
+
+      return node
+    end
+
     prev = nil
     current = @head
 
@@ -95,10 +102,10 @@ class List
 
     @head = @head.next_node
   end
-  
-  def contains? item = nil
+
+  def contains?(item = nil)
     temp = @head
-    
+
     while temp
       if block_given?
         return true if yield temp.data
@@ -112,7 +119,7 @@ class List
     false
   end
 
-  def find item = nil
+  def find(item = nil)
     index = 0
     temp = @head
 
@@ -137,23 +144,23 @@ class List
       temp = temp.next_node
     end
 
-    string += " nil"
+    string += "nil"
   end
 
-  def insert_at value, index
+  def insert_at(value, index)
     return self.prepend value if index == 0
 
     prev = nil
     current = @head
-    jndex = 0
+    currentIndex = 0
 
-    while current && jndex < index
-      jndex += 1
+    while current && currentIndex < index
+      currentIndex += 1
       prev = current
       current = current.next_node
     end
 
-    raise "Index out of bounds!" if jndex < index
+    raise "Index out of bounds!" if currentIndex < index
 
     node = Node.new value, current
     prev.next_node = node
@@ -161,31 +168,32 @@ class List
     node
   end
 
-  def remove_at index
+  def remove_at(index)
+    raise "List is empty!" unless @head
+
     return self.shift if index == 0
 
     prev = nil
     current = @head
-    jndex = 0
+    currentIndex = 0
 
-    while current.next_node && jndex < index
-      jndex += 1
+    while current.next_node && currentIndex < index
+      currentIndex += 1
       prev = current
       current = current.next_node
     end
 
-    raise "Index out of bounds!" if jndex < index
+    raise "Index out of bounds!" if currentIndex < index
 
     prev.next_node = current.next_node
     current
   end
-
 end
 
 class Node
   attr_accessor :data, :next_node
 
-  def initialize data, next_node
+  def initialize(data, next_node)
     @data = data
     @next_node = next_node
   end
