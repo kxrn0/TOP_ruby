@@ -1,4 +1,4 @@
-require_relative "list.rb"
+require_relative "lib/list.rb"
 
 class Person
   attr_accessor :name, :age
