@@ -5,4 +5,8 @@ class Pair
     @key = key
     @value = value
   end
+  
+  def to_s
+    "{ key: #{@key}, value: #{@value} }"
+  end
 end

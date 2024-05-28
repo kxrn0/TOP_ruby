@@ -4,39 +4,46 @@ require_relative "pair.rb"
 class HashTable
   def initialize
     @capacity = 16
-    @load_capacity = .75
+    @load_capacity = 0.75
     @pairCount = 0
-    @buckets = Array.new @capacity
+    @buckets = Array.new(@capacity) { List.new }
   end
 
   def migrate
-    puts "migrating..."
+    @capacity = @buckets.size * 2
+    tempBucket = Array.new(@capacity) { List.new }
+    
+    @buckets.each do |list|
+      node = list.head
+
+      while node
+        pair = node.data
+        index = (HashTable.hash pair.key) % @capacity
+
+        tempBucket[index].append pair
+
+        node = node.next_node
+      end
+    end
   end
 
-  def set_key(key, value)
+  def set(key, value)
     if @pairCount >= @capacity * @load_capacity
       migrate
     end
 
+    pair = Pair.new key, value
     index = (HashTable.hash key) % @capacity
     
-    puts index
-
-    node = @buckets[index]
-    if node.nil?
-      bucket = List.new
-      pair = Pair.new key, value
-      bucket.append pair
-    else
-      # If the bucket is not empty, see if there's already an item in the list
-      # with the given key, if so, replace the value in it with the new value,
-      # otherwise append it to the end of the list
-      
-    end
+    @buckets[index].put(pair) { |other| other.key == pair.key }
   end
 
   def to_s
-    "#{@buckets}"
+    string = ""
+
+    @buckets.each { |bucket| string += "#{bucket.to_s}\n"}
+    
+    string
   end
 
   def self.hash(string)

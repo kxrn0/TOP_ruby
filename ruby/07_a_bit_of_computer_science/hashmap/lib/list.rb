@@ -11,9 +11,7 @@ class List
     temp = @head
 
     while temp
-      result = yield temp.data
-      
-      if result
+      if yield temp.data
         temp.data = newData
 
         return

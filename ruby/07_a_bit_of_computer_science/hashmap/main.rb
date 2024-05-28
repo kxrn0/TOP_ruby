@@ -1,4 +1,5 @@
 require_relative "lib/list.rb"
+require_relative "lib/hashtable"
 
 class Person
   attr_accessor :name, :age
@@ -13,14 +14,12 @@ class Person
   end
 end
 
-people = List.new
+people = HashTable.new
 
-people.append Person.new "One", 78
-people.append Person.new "Two", 89
-people.append Person.new "Three", 90
-people.append Person.new "Four", 67
-people.append Person.new "Five", 56
+people.set "one", Person.new("One", 67)
+people.set "two", Person.new("Two", 78)
+people.set "three", Person.new("Three", 43)
+people.set "four", Person.new("Four", 53)
 
-people.put(Person.new "Zero", 66) {|p| p.name == "Three"}
+puts people.to_s
 
-puts people
