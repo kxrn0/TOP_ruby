@@ -5,7 +5,7 @@ class List
     @head = nil
   end
 
-  def put newData
+  def put(newData)
     raise "No condition given!" unless block_given?
 
     temp = @head
@@ -14,15 +14,17 @@ class List
       if yield temp.data
         temp.data = newData
 
-        return
+        return true
       end
 
       temp = temp.next_node
     end
 
     self.append newData
+
+    return false
   end
-  
+
   def get
     raise "No condition given!" unless block_given?
 
@@ -90,22 +92,6 @@ class List
     temp.data
   end
 
-  def at(index)
-    current = 0
-    temp = @head
-
-    while temp && current <= index
-      break if current == index
-
-      temp = temp.next_node
-      current += 1
-    end
-
-    raise "Index out of bounds!" if current < index
-
-    temp.data
-  end
-
   def pop
     raise "List is empty!" unless @head
 
@@ -137,36 +123,51 @@ class List
     node.data
   end
 
-  def contains?(item = nil)
-    temp = @head
+  def remove
+    notFound = { found: false, value: nil }
 
-    while temp
-      if block_given?
-        return true if yield temp.data
-      else
-        return true if item == temp.data
-      end
+    raise "No condition given!" unless block_given?
 
-      temp = temp.next_node
+    return notFound unless @head
+    if yield @head.data
+      found = { found: true, value: @head.data }
+
+      self.shift
+
+      return found
     end
 
-    false
+    prev = @head
+    current = @head.next_node
+
+    while current
+      if yield current.data
+        prev.next_node = current.next_node
+        found = { found: true, value: current.data }
+
+        return found
+      end
+
+      prev = current
+      current = current.next_node
+    end
+
+    notFound
   end
 
-  def find(item = nil)
-    index = 0
+  def to_a
+    raise "No condition given!" unless block_given?
+
+    array = []
     temp = @head
 
     while temp
-      if block_given?
-        return index if yield temp.data
-      else
-        return index if item == temp.data
-      end
+      array.push yield temp.data
 
       temp = temp.next_node
-      index += 1
     end
+
+    array
   end
 
   def to_s
@@ -179,68 +180,5 @@ class List
     end
 
     string += "nil"
-  end
-
-  def insert_at(value, index)
-    return self.prepend value if index == 0
-
-    prev = nil
-    current = @head
-    currentIndex = 0
-
-    while current && currentIndex < index
-      currentIndex += 1
-      prev = current
-      current = current.next_node
-    end
-
-    raise "Index out of bounds!" if currentIndex < index
-
-    node = Node.new value, current
-    prev.next_node = node
-
-    node
-  end
-
-  def remove_at(index)
-    raise "List is empty!" unless @head
-
-    return self.shift if index == 0
-
-    prev = nil
-    current = @head
-    currentIndex = 0
-
-    while current.next_node && currentIndex < index
-      currentIndex += 1
-      prev = current
-      current = current.next_node
-    end
-
-    raise "Index out of bounds!" if currentIndex < index
-
-    prev.next_node = current.next_node
-    current
-  end
-
-  def remove
-    raise "No condition given!" unless block_given?
-    
-    return nil unless @head
-    return self.shift if yield @head.data
-
-    prev = @head
-    current = @head.next_node
-
-    while current
-      if yield current.data
-        prev.next_node = current.next_node
-
-        return current.data
-      end
-
-      prev = current
-      current = current.next_node
-    end
   end
 end

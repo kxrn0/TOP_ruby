@@ -3,73 +3,132 @@ require_relative "pair.rb"
 
 class HashTable
   def initialize
+    self.reset
+  end
+  
+  def reset
     @capacity = 16
-    @load_capacity = 0.75
-    @pairCount = 0
+    @max_load_ratio = 0.75
+    @load_factor = 0.75
+    @pair_count = 0
     @buckets = Array.new(@capacity) { List.new }
   end
 
   def migrate
-    @capacity = @buckets.size * 2
-    tempBucket = Array.new(@capacity) { List.new }
-    
+    tempBuckets = Array.new(@capacity) { List.new }
+
     @buckets.each do |list|
       node = list.head
 
       while node
         pair = node.data
-        index = (HashTable.hash pair.key) % @capacity
+        index = HashTable.hash pair.key, @capacity
 
-        tempBucket[index].append pair
+        tempBuckets[index].append pair
 
         node = node.next_node
       end
     end
+
+    @buckets = tempBuckets
   end
 
   def set(key, value)
-    if @pairCount >= @capacity * @load_capacity
+    if @pair_count / @capacity >= @max_load_ratio
+      @capacity *= 2
       migrate
     end
 
     pair = Pair.new key, value
-    index = (HashTable.hash key) % @capacity
-    
-    @buckets[index].put(pair) { |other| other.key == pair.key }
+    index = HashTable.hash key, @capacity
+
+    result = @buckets[index].put(pair) { |other| other.key == pair.key }
+
+    @pair_count += 1 unless result
   end
 
-  def get key
-    index = (HashTable.hash key) % @capacity
+  def get(key)
+    index = HashTable.hash key, @capacity
 
-    @buckets[index].get { |pair| pair.key == key }
+    pair = @buckets[index].get { |pair| pair.key == key }
+
+    pair.value
   end
-  
-  def has? key
+
+  def has?(key)
     return true if get key
 
     false
   end
-  
-  def remove key
-    index = (HashTable.hash key) % @capacity
 
-    @buckets[index].remove { |pair| pair.key == key }
+  def remove(key)
+    index = HashTable.hash key, @capacity
+
+    result = @buckets[index].remove { |pair| pair.key == key }
+
+    if result[:found]
+      @pair_count -= 1
+      return result[:value]
+    end
+
+    if @pair_count / @capacity <= @max_load_ratio / 4
+      @capacity /= 2
+      migrate
+    end
+  end
+
+  def length
+    @pair_count
+  end
+
+  def clear
+    self.reset
+  end
+
+  def keys
+    all_keys = []
+
+    @buckets.each do |bucket|
+      all_keys += bucket.to_a { |pair| pair.key }
+    end
+
+    all_keys
+  end
+
+  def values
+    all_values = []
+
+    @buckets.each do |bucket|
+      all_values += bucket.to_a { |pair| pair.value }
+    end
+
+    all_values
+  end
+
+  def entries
+    all_entries = []
+
+    @buckets.each do |bucket|
+      all_entries += bucket.to_a { |pair| [pair.key, pair.value] }
+    end
+
+    all_entries
   end
 
   def to_s
     string = ""
 
-    @buckets.each { |bucket| string += "#{bucket.to_s}\n"}
-    
+    @buckets.each { |bucket| string += "#{bucket.to_s}\n" }
+
     string
   end
 
-  def self.hash(string)
+  def self.hash(string, capacity)
     code = 0
     p = 31
 
     string.each_char { |char| code = p * code + char.ord }
 
-    code
+    code % capacity
   end
 end
