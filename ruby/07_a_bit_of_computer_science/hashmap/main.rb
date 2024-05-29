@@ -10,7 +10,7 @@ class Person
   end
 
   def to_s
-    "name: #{@name}, age: #{@age}"
+    "{ name: #{@name}, age: #{@age} }"
   end
 end
 
@@ -21,5 +21,8 @@ people.set "two", Person.new("Two", 78)
 people.set "three", Person.new("Three", 43)
 people.set "four", Person.new("Four", 53)
 
-puts people.to_s
-
+puts people
+puts "-----------------"
+puts people.remove "three"
+puts "-----------------"
+puts people

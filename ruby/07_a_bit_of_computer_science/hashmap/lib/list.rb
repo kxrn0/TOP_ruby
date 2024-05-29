@@ -22,6 +22,18 @@ class List
 
     self.append newData
   end
+  
+  def get
+    raise "No condition given!" unless block_given?
+
+    temp = @head
+
+    while temp
+      return temp.data if yield temp.data
+
+      temp = temp.next_node
+    end
+  end
 
   def append(data)
     node = Node.new data, nil
@@ -209,5 +221,26 @@ class List
 
     prev.next_node = current.next_node
     current
+  end
+
+  def remove
+    raise "No condition given!" unless block_given?
+    
+    return nil unless @head
+    return self.shift if yield @head.data
+
+    prev = @head
+    current = @head.next_node
+
+    while current
+      if yield current.data
+        prev.next_node = current.next_node
+
+        return current.data
+      end
+
+      prev = current
+      current = current.next_node
+    end
   end
 end

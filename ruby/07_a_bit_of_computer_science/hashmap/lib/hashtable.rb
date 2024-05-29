@@ -38,6 +38,24 @@ class HashTable
     @buckets[index].put(pair) { |other| other.key == pair.key }
   end
 
+  def get key
+    index = (HashTable.hash key) % @capacity
+
+    @buckets[index].get { |pair| pair.key == key }
+  end
+  
+  def has? key
+    return true if get key
+
+    false
+  end
+  
+  def remove key
+    index = (HashTable.hash key) % @capacity
+
+    @buckets[index].remove { |pair| pair.key == key }
+  end
+
   def to_s
     string = ""
 
@@ -54,6 +72,4 @@ class HashTable
 
     code
   end
-  
-  
 end
