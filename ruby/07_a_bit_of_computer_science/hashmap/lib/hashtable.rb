@@ -3,11 +3,12 @@ require_relative "pair.rb"
 
 class HashTable
   def initialize
+    @min_capacity = 16
     self.reset
   end
-  
+
   def reset
-    @capacity = 16
+    @capacity = @min_capacity
     @max_load_ratio = 0.75
     @load_factor = 0.75
     @pair_count = 0
@@ -52,11 +53,13 @@ class HashTable
 
     pair = @buckets[index].get { |pair| pair.key == key }
 
-    pair.value
+    pair ? pair.value : nil
   end
 
   def has?(key)
-    return true if get key
+    @buckets.each do |bucket|
+      return true if bucket.get { |pair| pair.key == key }
+    end
 
     false
   end
@@ -68,12 +71,13 @@ class HashTable
 
     if result[:found]
       @pair_count -= 1
-      return result[:value]
-    end
 
-    if @pair_count / @capacity <= @max_load_ratio / 4
-      @capacity /= 2
-      migrate
+      if @pair_count / @capacity <= @max_load_ratio / 4 && @capacity > @min_capacity
+        @capacity = [@min_capacity, @capacity / 2].max
+        migrate
+      end
+
+      return result[:value]
     end
   end
 
