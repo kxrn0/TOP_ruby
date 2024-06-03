@@ -74,7 +74,7 @@ class Tree
   def balanced?
     Tree.tree_balanced? @root
   end
-  
+
   def rebalance
     items = []
     inorder { |node| items.push node.data }
@@ -106,10 +106,9 @@ class Tree
     leftHeight = Tree.tree_height node.left
     rightHeight = Tree.tree_height node.right
 
-    if 
-      ((leftHeight - rightHeight).abs <= 1) && 
-      tree_balanced?(node.left) && 
-      tree_balanced?(node.right)
+    if ((leftHeight - rightHeight).abs <= 1) &&
+       tree_balanced?(node.left) &&
+       tree_balanced?(node.right)
       return true
     end
 
@@ -192,7 +191,7 @@ class Tree
     cute.push node.left if node.left
     cute.push node.right if node.right
 
-    traverse cute, &block
+    level_order_traverse cute, &block
   end
 
   def self.breadth_traversal(tree, proc)
