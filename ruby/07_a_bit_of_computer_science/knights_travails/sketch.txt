@@ -67,7 +67,7 @@ function find_path start, target, size {
       moves.map! move => [...path, move]
       temps += moves
     }
-    
+
     paths = temps
   }
 }
