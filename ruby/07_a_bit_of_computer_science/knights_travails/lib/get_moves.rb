@@ -1,6 +1,6 @@
 require_relative "./point"
 
-def get_moves cell, size
+def get_moves(cell, size)
   points = [
     Point.new(-2, -1),
     Point.new(-1, -2),
@@ -9,7 +9,7 @@ def get_moves cell, size
     Point.new(2, 1),
     Point.new(1, 2),
     Point.new(-1, 2),
-    Point.new(-2, 1)
+    Point.new(-2, 1),
   ]
   moves = []
   downsize = size - 1
@@ -21,6 +21,6 @@ def get_moves cell, size
       moves.push move
     end
   end
-  
+
   moves
 end
