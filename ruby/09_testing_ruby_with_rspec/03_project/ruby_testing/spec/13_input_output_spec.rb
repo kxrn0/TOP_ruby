@@ -188,6 +188,7 @@ describe NumberGame do
 
       it 'completes loop and displays error message twice' do
         expect(game_loop).to receive(:puts).with('Input error!').twice
+
         game_loop.player_turn
       end
     end
