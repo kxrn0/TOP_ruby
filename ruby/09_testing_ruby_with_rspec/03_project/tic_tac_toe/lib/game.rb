@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
+# Tic-Tac-Toe game, call init to play
 class Game
-  @@winning_conds = [
+  WINNING_CONDS = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -7,24 +10,33 @@ class Game
     [1, 4, 7],
     [2, 5, 8],
     [0, 4, 8],
-    [2, 4, 6],
-  ]
+    [2, 4, 6]
+  ].freeze
 
   def init
     set_up
     play
   end
-  
-  def get_marker id, prev = nil
+
+  def player_input(choices, prompt, error)
+    loop do
+      print prompt
+      choice = gets.chomp
+
+      return choice if choices.include? choice
+
+      puts error
+    end
+  end
+
+  def get_marker(id, prev = nil)
     loop do
       print "Enter player #{id}'s marker: "
       marker = gets.chomp[0]
 
-      if marker.nil? || marker == prev
-        puts "Invalid input! Please try again!"
-      else
-        return marker
-      end
+      return marker unless marker.nil? || marker == prev
+
+      puts 'Please choose a different marker!'
     end
   end
 
@@ -34,20 +46,14 @@ class Game
   end
 
   def set_up_turns
-    loop do
-      print "Who goes first?\n(a) - #{@marker_a}\n(b) - #{@marker_b}\n> "
-      first = gets.chomp[0]
+    choices = %w[a b]
+    prompt = "Who goes first?\n(a) - #{@marker_a}\n(b) - #{@marker_b}\n> "
+    error = 'Invalid input! Enter either \'a\' or \'b\'.'
+    first = player_input(choices, prompt, error)
 
-      if first == 'a' || first == 'b'
-        @players = [@marker_a, @marker_b]
-        
-        @players.rotate! if first == 'b'
-        
-        return
-      else
-        puts 'Invalid input! Enter either \'a\' or \'b\'.'
-      end
-    end
+    @players = [@marker_a, @marker_b]
+
+    @players.rotate! if first == 'b'
   end
 
   def set_up
@@ -75,32 +81,22 @@ class Game
     "
   end
 
-  def get_cell
-    reg = /^[0-8]$/
-    
-    loop do
-      print "It's #{@players[@player_idx]}'s turn. Choose a cell: "
-      cell = gets.chomp
-      index = cell.to_i
-      match = cell.match reg
-      is_free = !@board[index]
-      
-      if match && is_free
-        @board[index] = @players[@player_idx]
+  def player_select
+    choices = (0..8).to_a.filter { |idx| true unless @board[idx] }
+    choices.map!(&:to_s)
+    prompt = "It's #{@players[@player_idx]}'s turn. Choose a cell: "
+    error = 'Invalid input! Please enter a valid cell!'
+    index = player_input(choices, prompt, error).to_i
 
-        return
-      end
-
-      puts 'Invalid input! Please enter a valid cell!'
-    end
+    @board[index] = @players[@player_idx]
   end
 
   def board_full?
-    @board.none? { |cell| cell.nil? }
+    @board.none?(&:nil?)
   end
-  
+
   def winner?
-    @@winning_conds.any? do |cond|
+    WINNING_CONDS.any? do |cond|
       callback = ->(marker) { cond.all? { |idx| @board[idx] == marker } }
 
       callback.call(@marker_a) || callback.call(@marker_b)
@@ -110,8 +106,8 @@ class Game
   def next_index!
     @player_idx = 1 - @player_idx
   end
-  
-  def choose_path again
+
+  def choose_path(again)
     if again
       set_up
     else
@@ -120,17 +116,18 @@ class Game
   end
 
   def play_again?
-    loop do
-      print "Play again (y / n)? : "
-      again = gets.chomp.downcase
-    
-      return true if again == 'y'
-      return false if again == 'n'
-    end
+    choices = %w[y n]
+    prompt = 'Play again (y / n) ? : '
+    error = "Please enter 'y' for YES or 'n' for NO."
+    choice = player_input(choices, prompt, error)
+
+    return true if choice == 'y'
+
+    false
   end
 
   def play
-    while @playing do
+    while @playing
       print_board
 
       if winner?
@@ -139,10 +136,10 @@ class Game
         choose_path play_again?
       elsif board_full?
         puts "Game Over! It's A Tie!"
-        
+
         choose_path play_again?
       else
-        get_cell
+        player_select
         next_index!
       end
     end
