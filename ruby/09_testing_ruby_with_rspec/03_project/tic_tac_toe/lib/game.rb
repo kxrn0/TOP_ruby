@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Tic-Tac-Toe game, call init to play
+# Tic-Tac-Toe
+# Call `.play` to start the game.
 class Game
   WINNING_CONDS = [
     [0, 1, 2],
@@ -13,9 +14,14 @@ class Game
     [2, 4, 6]
   ].freeze
 
-  def init
-    set_up
-    play
+  def initialize
+    reset
+  end
+
+  def reset
+    @board = Array.new 9
+    @player_idx = 0
+    @playing = true
   end
 
   def player_input(choices, prompt, error)
@@ -29,7 +35,7 @@ class Game
     end
   end
 
-  def get_marker(id, prev = nil)
+  def enter_marker(id, prev = nil)
     loop do
       print "Enter player #{id}'s marker: "
       marker = gets.chomp[0]
@@ -40,12 +46,12 @@ class Game
     end
   end
 
-  def set_up_markers
-    @marker_a = get_marker 'a'
-    @marker_b = get_marker 'b', @marker_a
+  def choose_markers
+    @marker_a = enter_marker 'a'
+    @marker_b = enter_marker 'b', @marker_a
   end
 
-  def set_up_turns
+  def choose_turns
     choices = %w[a b]
     prompt = "Who goes first?\n(a) - #{@marker_a}\n(b) - #{@marker_b}\n> "
     error = 'Invalid input! Enter either \'a\' or \'b\'.'
@@ -56,13 +62,9 @@ class Game
     @players.rotate! if first == 'b'
   end
 
-  def set_up
-    @board = Array.new 9
-    @player_idx = 0
-    @playing = true
-
-    set_up_markers
-    set_up_turns
+  def choose
+    choose_markers
+    choose_turns
   end
 
   def print_board
@@ -83,7 +85,9 @@ class Game
 
   def player_select
     choices = (0..8).to_a.filter { |idx| true unless @board[idx] }
+
     choices.map!(&:to_s)
+
     prompt = "It's #{@players[@player_idx]}'s turn. Choose a cell: "
     error = 'Invalid input! Please enter a valid cell!'
     index = player_input(choices, prompt, error).to_i
@@ -107,14 +111,6 @@ class Game
     @player_idx = 1 - @player_idx
   end
 
-  def choose_path(again)
-    if again
-      set_up
-    else
-      @playing = false
-    end
-  end
-
   def play_again?
     choices = %w[y n]
     prompt = 'Play again (y / n) ? : '
@@ -126,22 +122,39 @@ class Game
     false
   end
 
+  def choose_path(again)
+    if again
+      reset
+    else
+      @playing = false
+    end
+  end
+
+  def turn_order
+    print_board
+    player_select
+    next_index!
+  end
+
+  def game_over?
+    if winner?
+      "Player #{@players[next_index!]} wins!"
+    elsif board_full?
+      "Game Over! It's A Tie!"
+    end
+  end
+
   def play
     while @playing
-      print_board
-
-      if winner?
-        puts "Player #{@players[next_index!]} wins!"
-
-        choose_path play_again?
-      elsif board_full?
-        puts "Game Over! It's A Tie!"
-
-        choose_path play_again?
-      else
-        player_select
-        next_index!
+      choose
+      final_message = nil
+      until final_message
+        turn_order
+        final_message = game_over?
       end
+      print_board
+      puts final_message
+      choose_path play_again?
     end
   end
 end

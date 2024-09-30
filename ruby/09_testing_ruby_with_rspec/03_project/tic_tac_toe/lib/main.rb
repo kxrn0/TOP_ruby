@@ -1,5 +1,5 @@
-require_relative "./game.rb"
+require_relative './game.rb'
 
 geimu = Game.new
 
-geimu.init
+geimu.play
