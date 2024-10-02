@@ -95,11 +95,11 @@ class Game
     @board[index] = @players[@player_idx]
   end
 
-  def board_full?
+  def full?
     @board.none?(&:nil?)
   end
 
-  def winner?
+  def won?
     WINNING_CONDS.any? do |cond|
       callback = ->(marker) { cond.all? { |idx| @board[idx] == marker } }
 
@@ -137,9 +137,9 @@ class Game
   end
 
   def game_over?
-    if winner?
+    if won?
       "Player #{@players[next_index!]} wins!"
-    elsif board_full?
+    elsif full?
       "Game Over! It's A Tie!"
     end
   end
