@@ -1,4 +1,4 @@
-Connect four. The game will have two players, each with their own identifiable marker, which will be `x` and `o`. The game will first ask the players who should go first, and it will expect a player to enter one of the markers.
+Connect four. The game will have two players, each with their own identifiable marker, which will be `x` and `o`. The program will first ask the players who should go first, and it will expect a player to enter one of the markers.
 
 ```
 Connect Four. Copyright kxrn0, 1966.
@@ -18,10 +18,32 @@ Invalid input! please enter a valid choice!
 Who should go first (x / o)? >
 ```
 
+The program will then state the board size, and ask if they want to change it.
+
+```
+Board size: 9 by 6. Do you wish to change it (y / n)? >
+```
+
+The smallest dimension for the board will be 6, while the largest will be 18.
+
+```
+Board size: 9 by 6. Do you wish to change it (y / n)? > y
+
+Enter width (min: 6, max: 18) > 5
+
+Invalid input! width has to be in [6, 18]! try again!
+
+Enter width (min: 6, max: 18) > 7
+
+Enter height (min: 6, max: 18) >
+```
+
 Once the players have decided who will go first, the game will start.
 
 ```
 Who should go first (x / o)? > o
+
+Board size: 9x6. Do you wish to change it (y / n)? > n
 
  _____ _____ _____ _____ _____ _____ _____ _____ _____
 |     |     |     |     |     |     |     |     |     |
