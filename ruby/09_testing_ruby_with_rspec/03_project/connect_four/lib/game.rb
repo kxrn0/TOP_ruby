@@ -1,7 +1,7 @@
 # Connect Four
 # call `.play` to start
 class Game
-  def initialize(width = 6, height = 9)
+  def initialize(width = 9, height = 6)
     @players = ['x', 'o']
 
     reset width, height
@@ -77,8 +77,106 @@ class Game
     puts 'Connect Four. Copyright kxrn0, 1966.'
   end
 
+  def compute_index(column)
+    y = @height - 1
+
+    @height.times do |h|
+      index = column + (y - h) * @width
+
+      return index unless @board[index]
+    end
+  end
+
+  def valid_columns
+    col = @width - 1
+    (0..col).to_a.map(&:to_s).filter { |idx| true unless @board[idx.to_i] }
+  end
+
+  def swap!
+    @current_player_index = 1 - @current_player_index
+  end
+
+  def print_board
+    puts 'board'
+  end
+
   def turn_order
     print_board
+
+    current = @players[@current_player_index]
+    col = @width - 1
+    choices = valid_columns
+    prompt = "It's #{current}'s turn! enter a column to insert the stone [0, #{col}] > "
+    error = 'That column is unavailable! please choose a different one!'
+    selected = player_input(choices, prompt, error).to_i
+
+    index = compute_index selected
+    @board[index] = @players[@current_player_index]
+    swap!
+  end
+
+  def check_axis(a, b, idx)
+    winner = nil
+    count = 0
+
+    a.times do |i|
+      winner = nil
+      count = 0
+
+      b.times do |j|
+        index = idx.call i, j
+        char = @board[index]
+
+        if char == winner
+          count += 1
+        else
+          winner = char
+          count = 0
+        end
+
+        if count >= 4 && winner
+          return winner
+        end
+      end
+    end
+
+    if count >= 4 && winner
+      return winner
+    end
+  end
+
+  def check_x
+    idx = Proc.new { |y, x| x + y * @width }
+
+    check_axis @width, @height, idx
+  end
+
+  def check_y
+    idx = Proc.new { |x, y| x + y * @width }
+
+    check_axis @height, @width, idx
+  end
+
+  def full?
+    valid_columns.empty?
+  end
+
+  def game_over?
+    full? || @winner
+  end
+
+  def print_ending
+    puts 'bye'
+  end
+
+  def play_again?
+    # hi
+  end
+
+  def check_diagonal
+  end
+
+  def compute_winner
   end
 
   def play
@@ -86,7 +184,12 @@ class Game
     while @is_playing
       choose_turns
       resize_board
-      turn_order until game_over?
+
+      until game_over?
+        turn_order
+        @winner = compute_winner
+      end
+
       print_ending
       play_again?
     end

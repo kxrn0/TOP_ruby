@@ -1,4 +1,8 @@
-Connect four. The game will have two players, each with their own identifiable marker, which will be `x` and `o`. The program will first ask the players who should go first, and it will expect a player to enter one of the markers.
+# Connect four
+
+## Gameplay
+
+The game will have two players, each with their own identifiable marker, which will be `x` and `o`. The program will first ask the players who should go first, and it will expect a player to enter one of the markers.
 
 ```
 Connect Four. Copyright kxrn0, 1966.
@@ -129,7 +133,7 @@ If a user enters the index of a full column, they will be asked to enter again.
 
 It's x's turn! enter a column to insert the stone [0, 8] > 4
 
-That column is full! please choose a different one!
+That column is unavailable! please choose a different one!
 
 It's x's turn! enter a column to insert the stone [0, 8] >
 ```
@@ -179,4 +183,130 @@ or
 
 ```
 Do you wish to play again (y / n)? > n
+```
+
+## Implementation Details
+
+How do I find if someone has won? I need an algorithm to check that. I will divide it into three parts; checking if someone has won with a horizontal, vertical, or diagonal arrangement, so the function to compute the winner will look like this
+
+```
+function compute_winner {
+    return check_horizontal || check_vertical || check_diagonal
+}
+```
+
+### check_horizontal
+
+To check if there's a winner horizontally I think I will go row by row, cell by cell. So the algorithm could be like this:
+
+```
+function check_horizontal {
+    winner = nil
+    count = 0
+
+    for y = 0; y < rows; y++ {
+        winner = y * cols
+        count = 0
+
+        for x = 0; x < cols; x++ {
+            index = x + y * cols
+            char = board[index]
+
+            if char == winner
+                count++
+            else {
+                winner = char
+                count = 1
+            }
+
+            if count == 4 && winner
+                return winner
+        }
+    }
+
+    if count >= 4 && winner
+        return winner
+    nil
+}
+```
+
+I think the method for checking if someone has won with a verticall arrangement would be similar.
+
+```
+function check_vertical {
+    winner = nil
+    count = 0
+
+    for x = 0; x < cols; x++ {
+        winner = nil
+        count = 0
+
+        for y = 0; y < rows; y++ {
+            index = x + y * cols
+            char = board[index]
+
+            if char == winner
+                count++
+            else {
+                winner = char;
+                count = 1
+            }
+
+            if count == 4 && winner
+                return winner
+        }
+
+    }
+
+    if count >= 4 && winner
+        return winner
+
+    nil
+}
+```
+
+Mayhaps I could combine them and use a singular function for this
+
+```
+function check_axis a, b, idx {
+    winner = nil
+    count = 0
+
+    for i = 0; i < a; i++ {
+        winner = nil
+        count = 0
+
+        for j = 0; j < b; j++ {
+            index = idx i, j
+            char = board[index]
+
+            if char == winner
+                count++
+            else {
+                winner = char
+                count = 1
+            }
+
+            if count >= 4 && winner
+                return winner
+        }
+    }
+
+    if count >= 4 && winner
+        return winner
+
+    nil
+}
+
+function check_x {
+    idx = (y, x) => x + y * cols
+
+    check_axis rows, cols, idx
+}
+
+function check_y {
+    idx = (x, y) => x + y * cols
+
+    check_axis cols, rows, idx
+}
 ```

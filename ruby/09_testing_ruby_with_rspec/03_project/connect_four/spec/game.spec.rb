@@ -6,8 +6,8 @@ describe Game do
   describe '#initialize' do
     context 'when the game is created with the default parameters' do
       it 'it has the defalt values' do
-        expected_width = 6
-        expected_height = 9
+        expected_width = 9
+        expected_height = 6
         expected_board = Array.new expected_width * expected_height
         width = game.instance_variable_get(:@width)
         height = game.instance_variable_get(:@height)
@@ -32,8 +32,6 @@ describe Game do
           nil, nil, nil, 'o', 'x', nil, nil, nil, nil
         ]
 
-        game.instance_variable_set(:@width, 9)
-        game.instance_variable_set(:@height, 6)
         game.instance_variable_set(:@board, board)
         game.instance_variable_set(:@winner, 'o')
         game.instance_variable_set(:@current_player_index, 0)
@@ -99,10 +97,11 @@ describe Game do
         allow(game).to receive(:gets).and_return("a\n")
       end
 
-      it 'return it' do
+      it 'returns it' do
         expected_output = 'a'
 
         expect(game).to receive(:print).with(prompt).once
+
         result = game.player_input choices, prompt, error
 
         expect(result).to eq(expected_output)
@@ -203,6 +202,234 @@ describe Game do
     end
   end
 
+  describe '#resize_board' do
+    before do
+      allow(game).to receive(:change_dimension)
+      allow(game).to receive(:reset_board)
+    end
+
+    context 'when the user wants to resize' do
+      before do
+        allow(game).to receive(:resize?).and_return (true)
+      end
+
+      it 'let them through' do
+        expect(game).to receive(:change_dimension).twice
+        expect(game).to receive(:reset_board).once
+
+        game.resize_board
+      end
+    end
+
+    context "when the user doesn't want to resize" do
+      before do
+        allow(game).to receive(:resize?).and_return (false)
+      end
+
+      it "doesn't" do
+        expect(game).not_to receive(:change_dimension)
+        expect(game).not_to receive(:reset_board)
+
+        game.resize_board
+      end
+    end
+  end
+
+  describe '#valid_columns' do
+    subject(:game) { Game.new 6, 7 }
+
+    context 'when fed a board' do
+      before do
+        board = [
+          nil, nil, nil, 'x', nil, 'o',
+          nil, nil, 'x', 'o', nil, 'x',
+          nil, nil, 'o', 'x', nil, 'o',
+          nil, nil, 'x', 'o', nil, 'x',
+          nil, 'o', 'o', 'x', nil, 'o',
+          nil, 'x', 'o', 'x', nil, 'x',
+          'o', 'x', 'o', 'x', 'o', 'x'
+
+        ]
+
+        game.instance_variable_set(:@board, board)
+      end
+
+      it 'returns only the columns the user can put a stone in' do
+        expected_columns = %w[0 1 2 4]
+
+        columns = game.valid_columns
+
+        expect(columns).to eq(expected_columns)
+      end
+    end
+
+    context 'when given a full board' do
+      before do
+        board = [
+          'x', 'o', 'x', 'o', 'x', 'o',
+          'o', 'x', 'o', 'x', 'o', 'x',
+          'o', 'x', 'o', 'x', 'o', 'x',
+          'o', 'x', 'o', 'x', 'o', 'x',
+          'x', 'o', 'x', 'o', 'x', 'o',
+          'x', 'o', 'x', 'o', 'x', 'o',
+          'x', 'o', 'x', 'o', 'x', 'o'
+        ]
+
+        game.instance_variable_set(:@board, board)
+      end
+
+      it 'returns an empty array' do
+        expect(game.valid_columns).to be_empty
+      end
+    end
+  end
+
+  describe '#compute_index' do
+    subject(:game) { Game.new 6, 7 }
+    let (:columns) { [0, 1, 2, 4] }
+    let(:expected) { [30, 19, 2, 34] }
+
+    before do
+      board = [
+        nil, nil, nil, 'x', nil, 'o',
+        nil, nil, 'x', 'o', nil, 'x',
+        nil, nil, 'o', 'x', nil, 'o',
+        nil, nil, 'x', 'o', nil, 'x',
+        nil, 'o', 'o', 'x', nil, 'o',
+        nil, 'x', 'o', 'x', nil, 'x',
+        'o', 'x', 'o', 'x', 'o', 'x'
+      ]
+
+      game.instance_variable_set(:@board, board)
+    end
+
+    context 'when the user chooses a column' do
+      it 'returns the index the stone falls in' do
+        columns.each_with_index do |column, index|
+          expect(game.compute_index column).to eq(expected[index])
+        end
+      end
+    end
+  end
+
   describe '#turn order' do
+    subject(:game) { Game.new 6, 7 }
+
+    before do
+      board = [
+        nil, nil, nil, 'x', nil, 'o',
+        nil, nil, 'x', 'o', nil, 'x',
+        nil, nil, 'o', 'x', nil, 'o',
+        nil, nil, 'x', 'o', nil, 'x',
+        nil, 'o', 'o', 'x', nil, 'o',
+        nil, 'x', 'o', 'x', nil, 'x',
+        'o', 'x', 'o', 'x', 'o', 'x'
+      ]
+
+      game.instance_variable_set(:@board, board)
+      game.instance_variable_set(:@current_player_index, 1)
+
+      allow(game).to receive(:player_input).and_return('1')
+    end
+
+    context 'when the user makes a move' do
+      it 'updates the board, and changes the turn to the next player' do
+        expected_board = [
+          nil, nil, nil, 'x', nil, 'o',
+          nil, nil, 'x', 'o', nil, 'x',
+          nil, nil, 'o', 'x', nil, 'o',
+          nil, 'o', 'x', 'o', nil, 'x',
+          nil, 'o', 'o', 'x', nil, 'o',
+          nil, 'x', 'o', 'x', nil, 'x',
+          'o', 'x', 'o', 'x', 'o', 'x'
+        ]
+        expected_index = 0
+
+        expect(game).to receive(:puts)
+
+        game.turn_order
+
+        board = game.instance_variable_get(:@board)
+        index = game.instance_variable_get(:@current_player_index)
+
+        expect(board).to eq(expected_board)
+        expect(index).to eq(expected_index)
+      end
+    end
+  end
+
+  describe '#check_x' do
+    let(:wins) {
+      [
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            'o', 'o', 'o', nil, nil, nil, nil, nil, nil,
+            'x', 'x', 'x', 'x', nil, nil, nil, nil, nil
+          ],
+          winner: 'x'
+        }, {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, 'x', nil, nil, nil, nil, nil, nil,
+            'x', 'x', 'x', 'o', 'x', 'o', 'o', 'o', 'o',
+            'x', 'o', 'x', 'o', 'x', 'o', 'x', 'o', 'x',
+            'o', 'x', 'o', 'x', 'o', 'x', 'o', 'x', 'o'
+          ],
+          winner: 'o'
+        },
+        {
+          board: [
+            'x', nil, nil, nil, nil, nil, nil, nil, 'o',
+            'o', nil, nil, nil, 'x', nil, nil, nil, 'x',
+            'x', 'x', 'o', 'o', 'o', 'o', nil, nil, 'o',
+            'o', 'o', 'o', 'x', 'o', 'x', 'x', nil, 'x',
+            'x', 'x', 'o', 'x', 'o', 'x', 'o', 'o', 'o',
+            'o', 'o', 'x', 'x', 'x', 'o', 'x', 'x', 'x'
+          ],
+          winner: 'o'
+        }
+      # {
+      #   board: [
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil
+      #   ],
+      #   winner: 'x'
+      # },
+      # {
+      #   board: [
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
+      #     nil, nil, nil, nil, nil, nil, nil, nil, nil
+      #   ],
+      #   winner: 'x'
+      # }
+      ]
+    }
+
+    context 'when queried with boards with a horizontal winner' do
+      it 'returns the correct winner each time' do
+        wins.each do |win|
+          expected_winner = win[:winner]
+
+          game.instance_variable_set(:@board, win[:board])
+
+          winner = game.check_x
+
+          expect(winner).to eq(expected_winner)
+        end
+      end
+    end
   end
 end
