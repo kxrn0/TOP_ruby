@@ -392,29 +392,18 @@ describe Game do
             'o', 'o', 'x', 'x', 'x', 'o', 'x', 'x', 'x'
           ],
           winner: 'o'
+        },
+        {
+          board: [
+            nil, nil, nil, nil, nil, 'o', 'o', 'o', 'o',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'x', 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'o', 'x', 'o',
+            'x', 'x', 'x', nil, 'x', 'x', 'x', 'o', 'x'
+          ],
+          winner: 'o'
         }
-      # {
-      #   board: [
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil
-      #   ],
-      #   winner: 'x'
-      # },
-      # {
-      #   board: [
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil,
-      #     nil, nil, nil, nil, nil, nil, nil, nil, nil
-      #   ],
-      #   winner: 'x'
-      # }
       ]
     }
 
@@ -426,6 +415,243 @@ describe Game do
           game.instance_variable_set(:@board, win[:board])
 
           winner = game.check_x
+
+          expect(winner).to eq(expected_winner)
+        end
+      end
+    end
+  end
+
+  describe '#check_y' do
+    let(:wins) {
+      [
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            'x', nil, nil, nil, nil, nil, nil, nil, nil,
+            'x', 'o', nil, nil, nil, nil, nil, nil, nil,
+            'x', 'o', nil, nil, nil, nil, nil, nil, nil,
+            'x', 'o', nil, nil, nil, nil, nil, nil, nil
+          ],
+          winner: 'x'
+        },
+        {
+          board: [
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'o', 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'o', 'o', 'x', nil, nil, nil,
+            nil, nil, nil, 'o', 'x', 'o', nil, nil, nil
+          ],
+          winner: 'x'
+        },
+        {
+          board: [
+
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, 'o',
+            nil, nil, nil, nil, nil, nil, nil, nil, 'o',
+            nil, nil, nil, nil, nil, nil, 'x', 'x', 'o',
+            nil, nil, nil, nil, nil, nil, 'x', 'x', 'o'
+          ],
+          winner: 'o'
+        },
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, 'x',
+            nil, nil, nil, nil, nil, nil, nil, nil, 'x',
+            nil, nil, nil, nil, nil, nil, nil, nil, 'x',
+            nil, nil, nil, nil, nil, nil, nil, nil, 'x',
+            nil, nil, nil, nil, nil, nil, nil, 'o', 'o',
+            nil, nil, nil, nil, 'o', 'o', 'o', 'x', 'x'
+          ],
+          winner: 'x'
+        }
+
+      ]
+    }
+
+    context 'when queried with boards with a vertical winner' do
+      it 'returns the correct winner each time' do
+        wins.each do |win|
+          expected_winner = win[:winner]
+
+          game.instance_variable_set(:@board, win[:board])
+
+          winner = game.check_y
+
+          expect(winner).to eq(expected_winner)
+        end
+      end
+    end
+  end
+
+  describe '#check_diagonal' do
+    let(:wins) {
+      [
+        {
+          board: [
+
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, 'x', nil, nil, nil,
+            nil, nil, nil, nil, nil, 'o', 'x', nil, nil,
+            nil, nil, nil, nil, nil, 'x', 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x'
+          ],
+          winner: 'x'
+        },
+        {
+          board: [
+
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, 'x', nil, nil, nil, nil, nil,
+            nil, nil, 'x', 'x', 'o', nil, nil, nil, nil,
+            nil, 'x', 'x', 'o', 'o', nil, nil, nil, nil,
+            'x', 'o', 'o', 'o', 'x', nil, nil, nil, nil
+          ],
+          winner: 'x'
+        },
+        {
+          board: [
+
+            nil, nil, nil, nil, nil, nil, nil, nil, 'o',
+            nil, nil, nil, nil, nil, nil, nil, 'o', 'x',
+            nil, nil, nil, nil, nil, nil, 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'o', 'o', 'x',
+            nil, nil, nil, nil, nil, 'x', 'x', 'o', 'x',
+            nil, nil, nil, 'x', 'x', 'o', 'x', 'o', 'x'
+
+          ],
+          winner: 'o'
+        },
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, 'o', nil, nil,
+            nil, nil, nil, 'x', nil, 'o', 'o', nil, nil,
+            nil, nil, nil, 'x', 'o', 'x', 'o', nil, nil,
+            nil, nil, nil, 'o', 'x', 'x', 'x', nil, nil,
+            nil, nil, nil, 'x', 'x', 'o', 'o', nil, nil
+          ],
+          winner: 'o'
+        }
+
+      ]
+    }
+
+    context 'when queried with boards with a diagonal winner' do
+      xit 'returns the correct result each time' do
+        wins.each do |win|
+          expected_winner = win[:winner]
+
+          game.instance_variable_set(:@board, win[:board])
+
+          winner = game.check_diagonal
+
+          expect(winner).to eq(expected_winner)
+        end
+      end
+    end
+  end
+
+  describe '#compute_winner' do
+    let(:wins) {
+      [
+        {
+          board: [
+            nil, nil, nil, nil, nil, 'o', 'o', 'o', 'o',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'x', 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'o', 'x', 'o',
+            'x', 'x', 'x', nil, 'x', 'x', 'x', 'o', 'x'
+          ],
+          winner: 'o'
+        },
+        {
+          board: [
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'o', 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'o', 'o', 'x', nil, nil, nil,
+            nil, nil, nil, 'o', 'x', 'o', nil, nil, nil
+          ],
+          winner: 'x'
+        },
+        {
+          board: [
+
+            nil, nil, nil, nil, nil, nil, nil, nil, 'o',
+            nil, nil, nil, nil, nil, nil, nil, 'o', 'x',
+            nil, nil, nil, nil, nil, nil, 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'o', 'o', 'x',
+            nil, nil, nil, nil, nil, 'x', 'x', 'o', 'x',
+            nil, nil, nil, 'x', 'x', 'o', 'x', 'o', 'x'
+
+          ],
+          winner: 'o'
+        },
+        {
+          board: [
+            nil, nil, nil, 'o', 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'x', 'x', 'o', 'x', nil, nil,
+            nil, nil, nil, 'x', 'o', 'o', 'o', nil, nil,
+            nil, nil, nil, 'x', 'o', 'x', 'o', nil, nil,
+            nil, nil, nil, 'o', 'x', 'x', 'x', 'o', nil,
+            nil, nil, nil, 'x', 'x', 'o', 'o', 'x', nil
+          ],
+          winner: nil
+        },
+        {
+          board: [
+            'o', 'x', nil, 'o', 'x', nil, 'o', 'x', nil,
+            'x', 'o', nil, 'x', 'o', nil, 'x', 'o', nil,
+            'o', 'x', nil, 'o', 'x', nil, 'o', 'x', nil,
+            'x', 'o', nil, 'x', 'o', nil, 'x', 'o', nil,
+            'o', 'x', nil, 'o', 'x', nil, 'o', 'x', nil,
+            'x', 'o', nil, 'x', 'o', nil, 'x', 'o', nil
+          ],
+          winner: nil
+        },
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, 'x', nil, nil, nil, nil,
+            nil, nil, nil, 'o', 'x', 'o', nil, nil, nil
+          ],
+          winner: nil
+        },
+        {
+          board: [
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil,
+            nil, nil, nil, nil, nil, nil, nil, nil, nil
+          ],
+          winner: nil
+        }
+      ]
+    }
+
+    context 'when queried with boards with or without a winner' do
+      it 'returns the correct result each time' do
+        wins.each do |win|
+          expected_winner = win[:winner]
+
+          game.instance_variable_set(:@board, win[:board])
+
+          winner = game.compute_winner
 
           expect(winner).to eq(expected_winner)
         end

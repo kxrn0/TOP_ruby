@@ -127,34 +127,88 @@ class Game
         index = idx.call i, j
         char = @board[index]
 
-        if char == winner
+        if char && char == winner
           count += 1
-        else
+        elsif char
           winner = char
-          count = 0
+          count = 1
         end
 
-        if count >= 4 && winner
+        if winner && count >= 4
           return winner
         end
       end
     end
 
-    if count >= 4 && winner
-      return winner
-    end
+    nil
   end
 
   def check_x
     idx = Proc.new { |y, x| x + y * @width }
 
-    check_axis @width, @height, idx
+    check_axis @height, @width, idx
   end
 
   def check_y
     idx = Proc.new { |x, y| x + y * @width }
 
-    check_axis @height, @width, idx
+    check_axis @width, @height, idx
+  end
+
+  def cb(x0, y0, condx, pdtx)
+    idx0 = x0 + y0 * @width
+    char0 = @board[idx0]
+    winner = char0
+
+    xi = x0
+    while condx.call xi
+      yi = y0
+      while yi < y0 + 4 && yi < @width
+        idx = xi + yi * @width
+        char = @board[idx]
+
+        unless char && char == winner
+          return nil
+        end
+
+        yi += 1
+      end
+
+      xi = pdtx.call xi
+    end
+
+    winner
+  end
+
+  def check_diagonal
+    winner = nil
+
+    @width.times do |x|
+      @height.times do |y|
+        idx = x + y * @width
+        char = @board[idx]
+
+        next unless char
+
+        cond_r = Proc.new { |xi| xi < x + 4 && xi < @width }
+        pdt_r = Proc.new { |xi| xi + 1 }
+        res = cb x, y, cond_r, pdt_r
+
+        return res if res
+
+        cond_l = Proc.new { |xi| xi > x - 4 && xi >= 0 }
+        pdt_l = Proc.new { |xi| xi - 1 }
+        res = cb x, y, cond_l, pdt_l
+
+        return res if res
+      end
+    end
+
+    nil
+  end
+
+  def compute_winner
+    check_x || check_y || check_diagonal
   end
 
   def full?
@@ -171,12 +225,6 @@ class Game
 
   def play_again?
     # hi
-  end
-
-  def check_diagonal
-  end
-
-  def compute_winner
   end
 
   def play

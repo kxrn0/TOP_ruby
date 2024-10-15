@@ -205,7 +205,7 @@ function check_horizontal {
     count = 0
 
     for y = 0; y < rows; y++ {
-        winner = y * cols
+        winner = nil
         count = 0
 
         for x = 0; x < cols; x++ {
@@ -308,5 +308,53 @@ function check_y {
     idx = (x, y) => x + y * cols
 
     check_axis cols, rows, idx
+}
+```
+
+How do I find if someone has won with a diagonal arrangement? I think I should go cell by cell horizontally, and for each cell see if the next one stepping down to the right has the same value, if so, I do the same for that cell, and so on. If not, then I check if the one stepping down to the left has the same value, and so on. If not, I move to the next cell.
+
+```
+function cb(x0, y0, condx, pdtx) {
+    idx = x0 + y0 * cols
+    char = board[idx]
+    winner = char
+
+    for xi = x0; cond xi; xi = pdt xi {
+        for yi = y0; yi < y0 + 4 && yi < rows; yi++ {
+            idx = xi + yi * cols
+            char = board[idx]
+
+            unless char && char == winner
+                return nil
+        }
+    }
+
+    winner
+}
+
+function check_diagonal {
+    winner = nil
+    count = 0
+
+    for x = 0; x < cols; x++ {
+        for y = 0; y < rows; y++ {
+            index = x + y * cols
+            char = board[index]
+
+            next unless char
+
+            cond_r = xi => xi < x + 4 && xi < cols
+            pdt_r = xi => x + 1
+            res = cb x, y, cond_r, ptd_r
+
+            return res if res
+
+            cond_l = xi => xi > x - 4 && xi >= 0
+            pdt_l = xi => xi - 1
+            res = cb x, y, cond_l, pdt_l
+
+            return res if res
+        }
+    }
 }
 ```
