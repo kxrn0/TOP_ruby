@@ -51,7 +51,7 @@ class Game
   end
 
   def resize?
-    prompt = "Board size: #{@width} by #{@height}. Do you wish to change it (y / n)? >"
+    prompt = "Board size: #{@width} by #{@height}. Do you wish to change it (y / n)? > "
     yes_or_no? prompt
   end
 
@@ -96,8 +96,68 @@ class Game
     @current_player_index = 1 - @current_player_index
   end
 
+  def draw_head
+    top = '_' * 5
+    str = " #{top}" * @width
+    str += "\n"
+
+    str
+  end
+
+  def draw_body
+    str = ''
+    @height.times do |y|
+      a = Proc.new { "|#{' ' * 5}" }
+      b = Proc.new do |x, y|
+        idx = x + y * @width
+        char = @board[idx] || ' '
+
+        "|  #{char}  "
+      end
+      c = Proc.new { "|#{'_' * 5}" }
+      cb = Proc.new do |p|
+        @width.times do |x|
+          str += p.call x, y
+          str += '|' unless x < @width - 1
+        end
+      end
+
+      cb.call a
+      str += "\n"
+      cb.call b
+      str += "\n"
+      cb.call c
+      str += "\n"
+    end
+
+    str
+  end
+
+  def draw_feet
+    str = ''
+    top = "|#{' ' * 5}"
+    str += top * @width
+    str += "|\n"
+
+    @width.times do |x|
+      str += "|  #{x}  "
+    end
+
+    str += "|\n"
+
+    str
+  end
+
+  def draw_board
+    head = draw_head
+    body = draw_body
+    feet = draw_feet
+
+    head + body + feet
+  end
+
   def print_board
-    puts 'board'
+    puts draw_board
   end
 
   def turn_order
@@ -159,32 +219,32 @@ class Game
     idx0 = x0 + y0 * @width
     char0 = @board[idx0]
     winner = char0
+    count = 0
 
     xi = x0
-    while condx.call xi
-      yi = y0
-      while yi < y0 + 4 && yi < @width
-        idx = xi + yi * @width
-        char = @board[idx]
+    yi = y0
 
-        unless char && char == winner
-          return nil
-        end
+    while (condx.call xi) && (yi < y0 + 4)
+      idx = xi + yi * @width
+      char = @board[idx]
 
-        yi += 1
+      unless char && char == winner
+        return nil
       end
 
       xi = pdtx.call xi
+      yi += 1
+      count += 1
     end
 
-    winner
+    winner if count == 4
   end
 
   def check_diagonal
     winner = nil
 
-    @width.times do |x|
-      @height.times do |y|
+    @height.times do |y|
+      @width.times do |x|
         idx = x + y * @width
         char = @board[idx]
 
@@ -220,15 +280,31 @@ class Game
   end
 
   def print_ending
-    puts 'bye'
+    print_board
+
+    if @winner
+      puts "Game Over! #{@winner} is the winner!"
+    else
+      puts "Game Over! it's a tie!"
+    end
   end
 
   def play_again?
-    # hi
+    choices = %w[y n]
+    prompt = 'Do you wish to play again (y / n)? > '
+    error = "Please enter either 'y' or 'n'."
+    choice = player_input choices, prompt, error
+
+    if choice == 'y'
+      reset @width, @height
+    else
+      @is_playing = false
+    end
   end
 
   def play
     print_intro
+
     while @is_playing
       choose_turns
       resize_board

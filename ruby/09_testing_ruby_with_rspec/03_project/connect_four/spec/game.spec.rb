@@ -312,6 +312,101 @@ describe Game do
     end
   end
 
+  describe 'draw_board' do
+    let(:games) {
+      [
+        {
+          width: 9,
+          height: 6,
+          board: [
+            nil, nil, nil, nil, nil, 'o', 'o', 'o', 'o',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'o', 'x', 'o', 'x',
+            nil, nil, nil, nil, nil, 'x', 'o', 'x', 'o',
+            nil, nil, nil, nil, nil, 'o', 'o', 'x', 'o',
+            'x', 'x', 'x', nil, 'x', 'x', 'x', 'o', 'x'
+          ],
+          expected: <<~HEREDOC
+             _____ _____ _____ _____ _____ _____ _____ _____ _____
+            |     |     |     |     |     |     |     |     |     |
+            |     |     |     |     |     |  o  |  o  |  o  |  o  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |     |     |     |     |     |  o  |  x  |  o  |  x  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |     |     |     |     |     |  o  |  x  |  o  |  x  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |     |     |     |     |     |  x  |  o  |  x  |  o  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |     |     |     |     |     |  o  |  o  |  x  |  o  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |  x  |  x  |  x  |     |  x  |  x  |  x  |  o  |  x  |
+            |_____|_____|_____|_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |     |     |     |
+            |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
+          HEREDOC
+        },
+        {
+          width: 6,
+          height: 7,
+          board: [
+            nil, nil, nil, 'x', nil, 'o',
+            nil, nil, 'x', 'o', nil, 'x',
+            nil, nil, 'o', 'x', nil, 'o',
+            nil, nil, 'x', 'o', nil, 'x',
+            nil, 'o', 'o', 'x', nil, 'o',
+            nil, 'x', 'o', 'x', nil, 'x',
+            'o', 'x', 'o', 'x', 'o', 'x'
+          ],
+          expected: <<~HEREDOC
+             _____ _____ _____ _____ _____ _____
+            |     |     |     |     |     |     |
+            |     |     |     |  x  |     |  o  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |     |     |  x  |  o  |     |  x  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |     |     |  o  |  x  |     |  o  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |     |     |  x  |  o  |     |  x  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |     |  o  |  o  |  x  |     |  o  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |     |  x  |  o  |  x  |     |  x  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |  o  |  x  |  o  |  x  |  o  |  x  |
+            |_____|_____|_____|_____|_____|_____|
+            |     |     |     |     |     |     |
+            |  0  |  1  |  2  |  3  |  4  |  5  |
+          HEREDOC
+        }
+      ]
+    }
+
+    context 'when called to action' do
+      it 'boards the prints' do
+        games.each do |item|
+          game.instance_variable_set(:@width, item[:width])
+          game.instance_variable_set(:@height, item[:height])
+          game.instance_variable_set(:@board, item[:board])
+
+          drawing = game.draw_board
+
+          expect(drawing).to eq(item[:expected])
+        end
+      end
+    end
+  end
+
   describe '#turn order' do
     subject(:game) { Game.new 6, 7 }
 
@@ -545,7 +640,7 @@ describe Game do
     }
 
     context 'when queried with boards with a diagonal winner' do
-      xit 'returns the correct result each time' do
+      it 'returns the correct result each time' do
         wins.each do |win|
           expected_winner = win[:winner]
 

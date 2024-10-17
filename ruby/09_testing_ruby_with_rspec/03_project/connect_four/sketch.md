@@ -358,3 +358,160 @@ function check_diagonal {
     }
 }
 ```
+
+The algorithm seems to be wrong. I'm retarded. I ended up changing it a bit and now it seems to work.
+
+How do I print the board? Let's look at a simplified version of the problem first.
+
+Instead of how we show it above, let's print - for an empty space, and the corresponding character otherwise.
+
+A simple function that returns the string representation of the board could look like this
+
+```ruby
+def print_board(board, width, height)
+  str = ""
+
+  height.times do |y|
+    width.times do |x|
+      idx = x + y * width
+      char = board[idx] || "-"
+
+      str += char
+    end
+
+    str += "\n"
+  end
+
+  str
+end
+```
+
+So our final solution will most likely also have this overall shape. I'll go ahead and say that to draw the board like we show it above, for every cell we draw only three things; the left side, the bottom, and the choice, those things refering to
+
+left:
+
+```
+|
+|
+```
+
+bottom
+
+```
+|_____
+```
+
+choice
+
+```
+<space><space>['o', 'x', ' ']
+```
+
+with the top of the first cell being drawn separately. I think for every row I'll loop from 0 to width three times, each for each section of a cell. There is probably an easier or more efficient way of doing this, but that's the one that is immediately obvious to me. Or is it...
+
+I think I have it wrong. To build the grid so that it ends up looking how I want it to I think I'll have to build it row by row, so for a grid like
+
+```
+ _____ _____ _____ _____ _____ _____ _____ _____ _____
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |     |     |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |     |     |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |  o  |     |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |  o  |  x  |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |  o  |  x  |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|     |     |     |  o  |  x  |     |     |     |     |
+|_____|_____|_____|_____|_____|_____|_____|_____|_____|
+|     |     |     |     |     |     |     |     |     |
+|  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
+```
+
+If I have a variable `str` that will be the string representation of the board state, then I first set it the top of the grid, or
+
+```
+ _____ _____ _____ _____ _____ _____ _____ _____ _____
+```
+
+it can be initialized as
+
+```ruby
+top = " _____"
+str = top * @width
+```
+
+and then for every row I can add the top and bottom with
+
+```ruby
+def manufacture_board(board, width, height)
+  top = " _____"
+  str = top * width
+  str += "\n"
+  height.times do |y|
+    a = Proc.new {"|     "}
+    b = Proc.new do |x, y|
+        idx = x + y * width
+        char = board[idx] || " "
+
+        "|  #{char}  "
+    end
+    c = Proc.new {"|_____"}
+    cb = Proc.new do |p|
+      width.times do |x|
+        str += p.call x, y
+        str += "|" unless x < width - 1
+      end
+    end
+
+    cb.call a
+    str += "\n"
+    cb.call b
+    str += "\n"
+    cb.call c
+    str += "\n"
+  end
+  str
+end
+```
+
+and I think the final step is making `b` a proc so it can return the correct string. I'd have to check the types of `a`, `b`, and `c`, so it's better if all of them are procs.
+
+```ruby
+def draw_board(board, width, height)
+  top = " _____"
+  str = top * width
+  str += "\n"
+  height.times do |y|
+    a = Proc.new {"|     "}
+    b = Proc.new do |x, y|
+        idx = x + y * width
+        char = board[idx] || " "
+
+        "|  #{char}  "
+    end
+    c = Proc.new {"|_____"}
+    cb = Proc.new do |p|
+      width.times do |x|
+        str += p.call x, y
+        str += "|" unless x < width - 1
+      end
+    end
+
+    cb.call a
+    str += "\n"
+    cb.call b
+    str += "\n"
+    cb.call c
+    str += "\n"
+  end
+  str
+end
+```
