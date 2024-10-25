@@ -1,8 +1,8 @@
-BLACK = { p: "p", r: "r", n: "n", b: "b", q: "q", k: "k" }
-WHITE = { p: "p", r: "r", n: "n", b: "b", q: "q", k: "k" }
+BLACK = { p: "", r: "1", n: "♞", b: "♝", q: "♛", k: "♚" }
+WHITE = { p: "♙", r: "♖", n: "♘", b: "♗", q: "♕", k: "♔" }
 
-def draw_board(state, turn)
-  if turn == "black"
+def draw_board(state, perspective)
+  if perspective == "black"
     state = state.reverse
   end
 

@@ -55,3 +55,11 @@ def draw_board(state, turn)
 end
 
 ```
+
+What do I do about colors? a black character on black background may be impossible to make out. I really shouldn't think too much about it; I'll use black and white for the colors of the pieces, and red and green for the colors of the board. Red corresponds to black, and white corresponds to green.
+
+After playing around with ANSI escape color codes I think I'll have to "build" each representation of a piece on the board. The white pieces are just and outline of the black ones, so they may be harder to see, but I can paint the black pieces whatever color I want, so I can just use the black pieces and paint them white whenever I need a white one.
+
+When painting a piece if I don't specify the background color, it seems to stay transparent, which makes black pieces in a black background hard to see. So the piece will be constructed by looking at what color the square the piece is in, and setting the background of the piece appropriately.
+
+Each checkboard square will be composed of empty spaces painted their respective color. In the case of white squares, they will be painted green, which means they will be built from the string `"\e[101m \e[0m"`, while black squares will be red, which means they'll be made from the string `"\e[42m \e[0m"`. The background of the piece will depend on which square it is in. Now we need to find a way to tell the color of the square we are in.
