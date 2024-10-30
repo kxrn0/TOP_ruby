@@ -154,6 +154,91 @@ default = [
   ],
 ]
 
-puts draw_board default, "white"
-puts "-----------"
-puts draw_board default, "black"
+game_one = [
+  [
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+  ],
+  [
+    Square.new("black", Piece.new("pawn", "black")),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white", Piece.new("pawn", "black")),
+    Square.new("black"),
+    Square.new("white", Piece.new("pawn", "black")),
+  ],
+  [
+    Square.new("white"),
+    Square.new("black", Piece.new("pawn", "black")),
+    Square.new("white"),
+    Square.new("black", Piece.new("bishop", "black")),
+    Square.new("white", Piece.new("pawn", "black")),
+    Square.new("black"),
+    Square.new("white", Piece.new("king", "black")),
+    Square.new("black"),
+  ],
+  [
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white", Piece.new("pawn", "black")),
+    Square.new("black"),
+    Square.new("white"),
+  ],
+  [
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white", Piece.new("pawn", "white")),
+    Square.new("black"),
+    Square.new("white", Piece.new("queen", "black")),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+  ],
+  [
+    Square.new("black"),
+    Square.new("white", Piece.new("pawn", "white")),
+    Square.new("black"),
+    Square.new("white", Piece.new("knight", "white")),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black", Piece.new("pawn", "white")),
+    Square.new("white", Piece.new("king", "white")),
+  ],
+  [
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black", Piece.new("pawn", "white")),
+  ],
+  [
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white", Piece.new("queen", "white")),
+    Square.new("black"),
+    Square.new("white"),
+    Square.new("black"),
+    Square.new("white"),
+  ],
+]
+
+puts draw_board game_one, "black"
+
+# puts draw_board default, "white"
+# puts "-----------"
+# puts draw_board default, "black"
