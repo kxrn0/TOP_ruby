@@ -12,9 +12,9 @@
 =begin
   2.- What is the difference between an integer and a float?
 
-  An integer is a representation of an integer, and a float is an approximation of a rational number.
+  An integer is a representation of an integer, and a float is an approximation of a real number.
   When dividing two integers the result will be the integer portion of the operation. To get the floating
-  part as well, one of the integers has to be converted to float.
+  part as well, at least one of the integers has to be converted to float.
 =end
 
 =begin
@@ -32,14 +32,14 @@
 =begin
   5.- What is a string?
 
-  An arbitrary set of characters, the characters can be alphanumeric or symbols. A string is delimited by single or double
+  An arbitrary set of characters. A string is delimited by single or double
   quotes.
 =end
 
 =begin
   6.- What are the differences between single and double quotes?
 
-  Only double quotes allow for string interpolation and escape characters.
+  Only double quotes allow for string interpolation and escape characters. Single quotes can still escape single quotes with `\'`.
 =end
 
 =begin
@@ -64,7 +64,7 @@
   10.- What method would you use to split a string into an array?
   
   The .split method. When called without parameters it splits the string by spaces, getting rid of uneccessary ones. When called
-  with a string parameter it splits the string by that substring. Since it's  Ruby, it probably can do it by regex as well.
+  with a string parameter it splits the string by that substring. It can also take a regex and it splits at every match.
 =end
 
 =begin
@@ -77,13 +77,13 @@
 =begin
   12.- How do you access a specific character or substring?
 
-  With the [] operator. One digit makes the operator look for the character at that index, while more than one make it take a range.
+  With the [] operator. A single integer makes it return the character at that position, while a range takes a range of the string, so
 =end
 
 =begin
   13.- How do you convert other data types into strings?
 
-  With the .to_s method.
+  With the `.to_s` method, if they have one.
 =end
 
 =begin
@@ -97,14 +97,14 @@
 =begin
   15.- How do you create a symbol?
 
-  By prepending an unbroken string with :, or a quote delimited string by the same symbol.
+  By prepending an unbroken string with :, or a quote delimited string by the same character.
 =end
 
 =begin
   16.- What is the difference between a symbol and a string?
 
   Two different strings with the same characters in the same order are considered the same by the == operator, but have different
-  object ids, while two arbitrary symbols with the same characters in the same order are considered the same by the == operator,
+  object ids, while two symbols with the same characters in the same order are considered the same by the == operator,
   and will always have the same object id.
 =end
 

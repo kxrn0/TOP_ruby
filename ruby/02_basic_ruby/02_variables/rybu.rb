@@ -13,29 +13,30 @@
 =begin
   3.- What does the += operator do?
 
-  If the variable is a numeric value, and if the value on the right is a number, then it sets the variable to
-  its current value plus the value on the right.
+  It attempts to set the value of the variable on the left to the result of calling + operator on the variable with the value on
+  the right as the parameter.
 =end
 
 =begin
   4.- What does the -= operator do?
 
-  If the variable is a numeric value, and if the value on the right is a number, then it sets the variable to its
-  current value minus the value on the right.
+  It attempts to set the value of the variable on the left to the result of calling - operator on the variable with the value on
+  the right as the parameter.
 =end
 
 =begin
   5.- What does the *= operator do?
 
-  If the variable is a numeric value, and if the value on the right is a number, then it sets the variable to its
-  current value times the value on the right.
+  It attempts to set the value of the variable on the left to the result of calling * operator on the variable with the value on
+  the right as the parameter.
 =end
 
 =begin
   6.- What does the /= operator do?
 
-  If the variable is a numeric value, and if the value on the right is a number, then it sets the variable to its
-  current value divided by the value on the right.
+
+  It attempts to set the value of the variable on the left to the result of calling / operator on the variable with the value on
+  the right as the parameter.
 =end
 
 =begin
