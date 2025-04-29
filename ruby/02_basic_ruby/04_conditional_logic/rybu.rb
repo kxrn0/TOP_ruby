@@ -7,7 +7,7 @@
 =begin
   2.- What are truthy values?
 
-  Values that are not equal to the literal false, but that are threated the same by conditional constructs like if statements.
+  Anything but the literals `true` `false`, and `nil`. Truthy values have the same effect as `true` in conditional expressions, but are not equal to the literal `true`.
 =end
 
 =begin
@@ -41,7 +41,7 @@
 =begin
   7.- What is shortcircuit evaluation?
 
-  Using logical operators for control flow.
+  When one of the expressions in a logical combination is not evaluated because doing so would be pointless, like in `true || x`, the result woule be `true` regardless of the value of `x`, so `x` wouldn't be evaluated.
 =end
 
 =begin
