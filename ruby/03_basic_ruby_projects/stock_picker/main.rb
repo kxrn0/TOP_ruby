@@ -1,27 +1,23 @@
-def stock_picker prices
-  pair = [prices[0], prices[1]]
-  highest = prices[1] - prices[0]
-  
-  i = 0
-  while i < prices.length - 1
-    j = i + 1
-    while j < prices.length
-      value = prices[j] - prices[i]
+def stock_picker(prices)
+  pair = [0, 0]
+  highest = -1 * Float::INFINITY
+  last = prices.size - 1
 
-      if highest < value
-        highest = value
-        pair = [i, j]
+  (0...last).each do |i|
+    ((i + 1)..last).each do |j|
+      diff = prices[j] - prices[i]
+
+      if diff > highest
+        highest = diff
+        pair[0] = i
+        pair[1] = j
       end
-
-      j += 1
     end
-
-    i += 1
   end
 
   pair
 end
 
-p stock_picker [17,3,6,9,15,8,6,1,10] 
+p stock_picker [17, 3, 6, 9, 15, 8, 6, 1, 10]
 p stock_picker [1, 10, 20, 30, 20, 10]
 p stock_picker [10, 20, 30, 50, 100]

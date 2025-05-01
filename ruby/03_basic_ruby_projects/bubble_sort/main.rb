@@ -1,16 +1,17 @@
-def bubble_sort array
+def bubble_sort(array)
   unsorted = array.length
 
-  while unsorted != 0
-    j = 0
-    while j < unsorted - 1
-      if array[j + 1] < array[j]
-        temp = array[j + 1]
-        array[j + 1] = array[j]
-        array[j] = temp
-      end
+  until unsorted == 0
+    last = unsorted - 1
 
-      j += 1
+    (0...last).each do |i|
+      curr_val = array[i]
+      next_val = array[i + 1]
+
+      if curr_val > next_val
+        array[i] = next_val
+        array[i + 1] = curr_val
+      end
     end
 
     unsorted -= 1
@@ -19,4 +20,4 @@ def bubble_sort array
   array
 end
 
-p bubble_sort [4,3,78,2,0,2]
+p bubble_sort [4, 3, 78, 2, 0, 2]

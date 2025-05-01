@@ -4,4 +4,4 @@ The basic logic is "For each word in the dictionary, check if it is in the given
 
 What does that mean? Consider the strings `str = "abcdebcabebc", d = "bc"`. We can see that `d` is a substring of `str` in various parts.
 
-For each character in `str`, if the current character is equal to the first character, find a substring from the current index to the current index plus teh length of the current word. If the word and the substring are equal, increase the count for the current word, and advance the index by the length of the word.
+For each character in `str`, if the current character is equal to the first character, find a substring from the current index to the current index plus the length of the current word. If the word and the substring are equal, increase the count for the current word, and advance the index by the length of the word.
