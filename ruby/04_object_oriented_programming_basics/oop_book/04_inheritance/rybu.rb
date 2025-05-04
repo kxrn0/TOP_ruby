@@ -12,18 +12,18 @@ Then create a new class called MyTruck that inherits from your superclass that a
   end
 
   class Car < Vehicle
-    def initialize color, year, model, grading
-      super color, year, model
+    GRADING = "T23"
 
-      @grading = grading
+    def initialize color, year, model
+      super color, year, model
     end
   end
 
   class Truck
-    def initialize color, year, model, capacity
-      super color, year, model
+    RISK_OF_HEAVY_METAL_POISONING = true
 
-      @capacity = capacity
+    def initialize color, year, model
+      super color, year, model
     end
   end
 =end
@@ -163,4 +163,8 @@ Then create a new class called MyTruck that inherits from your superclass that a
   and the error NoMethodError: private method `hi' called for #<Person:0x007ff61dbb79f0>
 from (irb):8
 from /usr/local/rvm/rubies/ruby-2.0.0-rc2/bin/irb:16:in `<main>'
+
+What is the problem and how would you go about fixing it?
+
+We can't access the private method `hi` of the object. It should be made public if we want to access it.
 =end
