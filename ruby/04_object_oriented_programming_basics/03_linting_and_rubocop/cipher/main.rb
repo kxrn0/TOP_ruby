@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def reorder(char, shift)
   length = 26
   ascii_shift = char == char.upcase ? 65 : 97
@@ -8,7 +10,7 @@ def reorder(char, shift)
 end
 
 def cipher(string, shift)
-  chars = string.split ""
+  chars = string.chars
   ciphered = chars.map do |char|
     next char unless char.match?(/[a-z]/i)
 
@@ -18,12 +20,12 @@ def cipher(string, shift)
   ciphered.join
 end
 
-puts "Enter string:"
+puts 'Enter string:'
 input = gets.chomp
 shift = 0
 
 loop do
-  puts "Enter shift:"
+  puts 'Enter shift:'
   shift = gets.chomp.to_i
 
   unless shift.zero?

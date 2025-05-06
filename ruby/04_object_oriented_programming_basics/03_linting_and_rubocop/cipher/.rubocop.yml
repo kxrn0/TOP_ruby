@@ -1,9 +1,6 @@
 # This is .rubocop.yml in ~/
+
+require: rubocop-performance
+
 AllCops:
   NewCops: enable
-
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/FrozenStringLiteralComment:
-  EnforcedStyle: never
