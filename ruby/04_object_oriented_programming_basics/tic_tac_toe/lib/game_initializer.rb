@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
 require_relative 'inputable'
+require_relative 'game'
 require_relative 'player'
 require_relative 'board'
 
@@ -13,6 +14,8 @@ class GameInitializer
   end
 
   def set_up_game
+    print_welcome_message
+
     naughts_name, crosses_name = decide_names
 
     set_up_players naughts_name, crosses_name
@@ -20,9 +23,27 @@ class GameInitializer
     set_up_turn naughts_name, crosses_name
 
     set_up_board
+
+    print_help
+    deep_sleep
   end
 
   private
+
+  def print_welcome_message
+    puts 'TIC TAC TOE'
+    puts "copyright @kxrn0, 1985\n\n"
+    puts 'The game will use naughts (o), and crosses (x) for the markers.'
+  end
+
+  def print_help
+    puts "\n#{Game.help_message}"
+  end
+
+  def deep_sleep
+    puts "\nThe game is loading, please wait warmly...\n"
+    sleep 3
+  end
 
   def set_up_board
     @game.board = Board.new

@@ -33,9 +33,9 @@ Enter a, b, or c > a
 Help:
   h             - show help menu
   b             - show board
+  s             - show current scores
   c             - toggle cell numbers
   r             - restart this game
-  n             - new game
   k             - reset everything
   e             - terminate program
   <cell_number> - choose a cell
@@ -99,9 +99,9 @@ We will also need to handle errors and accidental inputs.
 Help:
   h             - show help menu
   b             - show board
+  s             - show current scores
   c             - toggle cell numbers
   r             - restart game
-  n             - new game
   k             - reset everything
   e             - terminate program
   <cell_number> - choose a cell
@@ -109,6 +109,7 @@ Help:
 「player one」 > c
 
 Cell numbers disabled
+
      |     |
      |     |
 _____|_____|_____
@@ -122,6 +123,7 @@ _____|_____|_____
 「player one」 > c
 
 Cell numbers enabled
+
      |     |
      |     |
 ____1|____2|____3
@@ -134,7 +136,7 @@ ____4|____5|____6
 
 「player one」 > 100
 
-Invalid cell number! Please enter a number in [1, 9] for the cells!
+Invalit input! Please enter a number in [1, 9], or a help command!
 
 「player one」 > b
 
@@ -148,9 +150,9 @@ ____4|____5|____6
      |     |
     7|    8|    9
 
-「player one」 > n
+「player one」 > r
 
-New game? The current one will be discarded (y / n) > n
+Restart current game? progress will be lost (y / n) > n
 
 「player one」 > e
 
@@ -374,4 +376,126 @@ while this.isRunning {
 }
 ```
 
-The life cycle class may make a game logic handler obsolete.
+The life cycle class may make a game logic handler obsolete, as we can see if there's a winner by using a method from the `Board` class, and the rest of the game logic could be handled in the life cycle manager.
+
+---
+
+As noted above, there's a `@isRunning` variable that is true as long as the program is running. Once this variable is set to false, the program stops.
+
+Needless to say, this variable is stored in the `LifeCycleManager` instance.
+
+The game starts when the method `start` is called on the `Game` instance.
+
+What happens in this method? I'd guess that some method of the `LifeCycleManager` is called in here to start the game loop.
+
+But the game also needs to be initialized by asking the users for names and turn order, so the `Game#start` first calls `GameInitializer#set_up_game` and then the `LifeCycleManager` instance method.
+
+What is this `LifeCycleManager` method called? does it just set up some stuff, and call the actual method that does the gaming, or is it responsible for it? I think it should be something like
+
+```
+play() {
+     while this.isRunning {
+          this.update
+
+          if this.game.board.game_over
+               print "game over, play again (y / n)? >"
+               input = get_input
+
+          if input == "n"
+               this.isRunning = false
+     }
+}
+```
+
+It will be a bit more complicated than that. The player objects will keep track of scores, so once a game is over, the players can choose to start a new game with players with different names, or start a round with the same player objects.
+
+The sketch
+
+```
+「player one」 > 3
+
+     |     |
+     |  o  |..o..
+____1|____2|____3
+     |     |
+  x  |..o..|
+____4|____5|____6
+     |     |
+..o..|  x  |  x
+    7|    8|    9
+
+「player one」 WINS!
+
+CURRENT SCORE:
+  「player one」: 1
+  「player two」: 0
+
+Do you wish to play again (y / n)? >
+```
+
+doesn't seem to take this into account.
+
+If the players enter n, the program terminates.
+
+If they enter y, they'll be asked if the game should be another round, or if they want to start from scratch.
+
+```
+Do you wish to play again (y / n)? > y
+
+Start another round, or start from scratch?
+
+(a) - new round
+(b) - scrap
+
+Enter a or b >
+```
+
+Then
+
+```
+Enter a or b > a
+
+The game is loading, please wait warmly...
+
+     |     |
+     |     |
+____1|____2|____3
+     |     |
+     |     |
+____4|____5|____6
+     |     |
+     |     |
+    7|    8|    9
+
+「player one」 >
+```
+
+or
+
+```
+Enter a or b > b
+
+TIC TAC TOE
+copyright @kxrn0, 1985
+
+The game will use noughts (o) and crosses (x) for the markers.
+
+Who will be noughts? >
+```
+
+Thus, the `play` method is more like
+
+```
+play() {
+     while this.isRunning {
+          this.game.board.draw
+          this.make_move
+
+          winner = this.game.board.compute_winner
+
+          unless winner.null? {
+               this.reset
+          }
+     }
+}
+```
