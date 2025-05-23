@@ -8,18 +8,34 @@ class LogicHandler
 
   def initialize(game)
     @game = game
-    @is_running = true
+    @restarted_game = false
+    @loop_make_move = true
+  end
+
+  def move
+    @restarted_game = false
+
+    @game.board.draw
+
+    make_move
+  end
+
+  def update
+    winner = @game.board.compute_winner
+
+    reset unless winner.nil?
   end
 
   def play
-    while @is_running
-      @game.board.draw
+    while @game.is_running
 
-      make_move
+      move
 
-      winner = @game.board.compute_winner
-
-      reset unless winner.nil
+      if @restarted_game
+        restart
+      else
+        update
+      end
     end
   end
 
@@ -35,22 +51,51 @@ class LogicHandler
     get_input prompt, error_message, options, excluded
   end
 
-  def act_on_choice(choice)
-    is_number = choice =~ /\d/
+  def update_board(cell_number)
+    return if cell_number.nil?
+
+    marker = @game.players[@turn].marker
+    @game.board.set_cell cell_number, marker
+  end
+
+  def perform_action(option)
+    case option
+    when 'h'
+      puts 'help...'
+    when 'b'
+    when 's'
+    when 'c'
+    when 'r'
+    when 'k'
+    when 'e'
+    end
+  end
+
+  def act_on_option(option)
+    is_number = option =~ /\d/
 
     if is_number
-      puts 'update the board'
+      option.to_i
     else
-      puts 'do something else'
+      input = input.downcase
+
+      perform_action input
     end
   end
 
   def make_move
-    valid_choice = false
+    @loop_make_move = true
 
-    choice = make_choice until valid_choice
+    cell_number = nil
 
-    act_on_choice choice
+    while @loop_make_move
+      input = make_choice
+
+      cell_number = act_on_option input
+      @loop_make_move = cell_number.nil?
+    end
+
+    update_board cell_number
   end
 
   def reset

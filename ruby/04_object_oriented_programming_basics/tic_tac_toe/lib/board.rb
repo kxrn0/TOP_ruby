@@ -4,6 +4,11 @@
 class Board
   def initialize
     @cells = Array.new 9
+    @show_cell_numbers = true
+  end
+
+  def toggle_cell_numbers
+    @show_cell_numbers = !@show_cell_numbers
   end
 
   def draw
@@ -20,5 +25,14 @@ class Board
     @cells.each_with_index { |cell, idx| taken_cells.push idx unless cell.nil? }
 
     taken_cells
+  end
+
+  def set_cell(number, marker)
+    index = number - 1
+    @cells[index] = marker
+  end
+
+  def board_full?
+    @cells.none?(&:nil?)
   end
 end

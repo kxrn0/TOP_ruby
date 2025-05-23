@@ -4,16 +4,17 @@ require_relative 'game_initializer'
 require_relative 'logic_handler'
 
 # Manages the game
+# call `start` to start the game
 class Game
-  attr_reader :player, :board
+  attr_reader :players, :board, :turn, :is_running, :round
 
   HELP_MESSAGE = <<~HEREDOC
     Help:
       h             - show help menu
       b             - show board
+      s             - show current scores
       c             - toggle cell numbers
-      r             - restart this game
-      n             - new game
+      r             - restart game
       k             - reset everything
       e             - terminate program
       <cell_number> - choose a cell
@@ -38,10 +39,25 @@ class Game
     @players = [nil, nil]
     @turn = 0
     @show_cell_numbers = true
+    @is_running = false
+    @round = nil
+  end
+
+  def print_help
+    puts "\n#{HELP_MESSAGE}"
+  end
+
+  def deep_sleep
+    puts "\nThe game is loading, please wait warmly...\n"
+    sleep 3
   end
 
   def start
     @initializer.set_up_game
+
+    print_help
+    deep_sleep
+
     @logic_handler.play
   end
 end

@@ -84,6 +84,7 @@ ____4|____5|____6
 
 「player one」 WINS!
 
+ROUND 1
 CURRENT SCORE:
   「player one」: 1
   「player two」: 0
@@ -426,6 +427,7 @@ ____4|____5|____6
 
 「player one」 WINS!
 
+ROUND 1
 CURRENT SCORE:
   「player one」: 1
   「player two」: 0
@@ -489,13 +491,207 @@ Thus, the `play` method is more like
 play() {
      while this.isRunning {
           this.game.board.draw
+
           this.make_move
 
           winner = this.game.board.compute_winner
 
-          unless winner.null? {
-               this.reset
-          }
+          this.reset unless winner.nil?
      }
 }
 ```
+
+I need to flesh out this a bit more.
+
+In particular the `make_move` method.
+
+The `make_move` method is also a loop. It runs while the user enters something other than a valid cell number. I think it will be like this
+
+```
+make_move() {
+     cell_number = null
+
+     while cell_number.null? {
+          input = this.make_choice
+
+          if /\d/.test input
+               cell_number = input.to_i
+          else
+               this.perform_action input
+     }
+
+     this.game.board.set_cell
+          cell_number,
+          this.game.players[this.game.turn].marker
+}
+```
+
+I don't think this is enough, as the user can restart the current game, reset everything, and terminate the program from in here. Can this code handle that?
+
+Imagine there are two players, x and o.
+
+The game starts with x going first.
+
+After some more moves from each player, it's time for o to go, however for whatever reason both players agree to restart the current game.
+
+Thus, o enters r, so `perform_action` is called with that parameter.
+
+What can `perform_action` do to restart the game? it can't change `cell_number`, so it can't stop the `make_move` loop, so no, `cell_number`, or something equivalent has to be made an instance variable.
+
+We also need to keep track of whose turn it was when the current round started. In our example above, if the game is restarted on o's turn, the turn should be reset to x's. The same if it's restarted on x's turn.
+
+Thus, we need an instance variable that checks if the input on `make_move` is a cell number. Something like
+
+```
+make_move() {
+     this.loop_make_move = true
+
+     cell_number = null
+
+     while this.loop_make_move {
+          input = this.make_choice
+
+          if /\d/.test input {
+               cell_number = input.to_i
+               this.loop_make_move = false
+          } else
+               this.perform_action input
+     }
+
+     this.game.board.set_cell
+          cell_number,
+          this.game.players[this.game.turn].marker
+}
+```
+
+What will `perform_action` look like so it will be able to do what it's expected to?
+
+```
+perform_action(option) {
+     switch option {
+          when 'h'
+               Game.print_help
+          when 'b'
+               this.game.board.draw
+          when 's'
+               this.game.show_scores
+          when 'c'
+               this.game.board.toggle_cell_numbers
+          when 'r'
+               // rest of the fucking...
+          when 'k'
+               // rest of the fucking...
+          when 'e'
+               // rest of the fucking...
+     }
+}
+```
+
+We need more restructuring.
+
+If we restart the current game we won't have anything to set the board cell to, and we don't need to compute the winner, so, at least for handling restart, we need to change `play` and `make_move` to
+
+```
+play() {
+     while this.isRunning {
+          this.restarted_game = false
+
+          this.game.board.draw
+
+          this.make_move
+
+          if this.restarted_game {
+               this.reset
+
+               continue
+          }
+
+          winner = this.game.board.compute_winner
+
+          this.reset unless winner.nil?
+     }
+}
+```
+
+```
+make_move() {
+     this.loop_make_move = true
+
+     cell_number = null
+
+     while this.loop_make_move {
+          input = this.make_choice
+
+          if /\d/.test input {
+               cell_number = input.to_i
+               this.loop_make_move = false
+          } else
+               this.perform_action input
+     }
+
+     unless cell_number.null?
+          this.game.board.set_cell
+               cell_number,
+               this.game.players[this.game.turn].marker
+}
+```
+
+so we have
+
+```
+perform_action(option) {
+     switch option {
+               // rest of the fucking...
+          when 'r' {
+               this.restarted_game = true
+               this.loop_make_move = false
+
+               puts "restarting game!"
+          }
+          when 'k'
+               // rest of the fucking...
+          when 'e'
+               // rest of the fucking...
+     }
+}
+```
+
+What is reset? for restarting the game it should reset the board to a blank state, and set the turn to what it was at the beginning of the round, but it should leave the players alone. Other settings like `show_cell_number` should also remain the same.
+
+Turn, round, settings. Where should we keep these, and how should we set them?
+
+Round. It is set to 1 when the game is initialized. It will then be set to increased by one by a `LogicHandler` method after a game ends.
+
+Similarly, the initial turn for the round can be set like that.
+
+The concepts of round and turn are connected, I almost want to make a class for it
+
+```ruby
+class Round
+     att_accessor :number, :first_turn
+
+     def initialize number, first_turn
+          @number = number
+          @first_turn = first_turn
+     end
+end
+```
+
+The values of the instance will be changed when the players start another game.
+
+---
+
+Ruby is complaining that the cyclomatic complexity of `perform_action` is too high. I think I should categorize the actions into three types
+
+- display actions
+  - h - show help menu
+  - b - show board
+  - s - show current scores
+- modify the current game
+  - c - toggle cell numbers
+  - r - restart game
+- catastrophic
+  - k - reset everything
+  - e - terminate program
+
+I should eventually develop an abstraction that manages this properly, but for now I'll focus on getting the basic logic working, so I'll use a simple `case` statement.

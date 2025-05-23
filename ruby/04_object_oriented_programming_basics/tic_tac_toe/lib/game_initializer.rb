@@ -4,6 +4,7 @@ require_relative 'inputable'
 require_relative 'game'
 require_relative 'player'
 require_relative 'board'
+require_relative 'round'
 
 # Initializes the state of a Game object.
 class GameInitializer
@@ -24,8 +25,9 @@ class GameInitializer
 
     set_up_board
 
-    print_help
-    deep_sleep
+    @game.board = Board.new
+    @game.round = Round.new 1, @game.turn
+    @game.is_running = true
   end
 
   private
@@ -34,15 +36,6 @@ class GameInitializer
     puts 'TIC TAC TOE'
     puts "copyright @kxrn0, 1985\n\n"
     puts 'The game will use naughts (o), and crosses (x) for the markers.'
-  end
-
-  def print_help
-    puts "\n#{Game.help_message}"
-  end
-
-  def deep_sleep
-    puts "\nThe game is loading, please wait warmly...\n"
-    sleep 3
   end
 
   def set_up_board
