@@ -8,4 +8,9 @@ class Round
     @number = number
     @first_turn = first_turn
   end
+
+  def advance
+    @number += 1
+    @first_turn = 1 - @first_turn
+  end
 end

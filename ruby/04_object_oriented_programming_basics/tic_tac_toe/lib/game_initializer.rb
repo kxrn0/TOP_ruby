@@ -15,32 +15,20 @@ class GameInitializer
   end
 
   def set_up_game
-    print_welcome_message
+    @game.printer.print_welcome_message
 
     naughts_name, crosses_name = decide_names
-
     set_up_players naughts_name, crosses_name
-
     set_up_turn naughts_name, crosses_name
-
-    set_up_board
 
     @game.board = Board.new
     @game.round = Round.new 1, @game.turn
-    @game.is_running = true
+    @game.ties = 0
+
+    @game.logic_handler.reset
   end
 
   private
-
-  def print_welcome_message
-    puts 'TIC TAC TOE'
-    puts "copyright @kxrn0, 1985\n\n"
-    puts 'The game will use naughts (o), and crosses (x) for the markers.'
-  end
-
-  def set_up_board
-    @game.board = Board.new
-  end
 
   def compute_turn(choice)
     case choice
@@ -53,19 +41,10 @@ class GameInitializer
     end
   end
 
-  def create_order_message(naughts_name, crosses_name)
-    <<~HEREDOC
-      Who will go first?
-        (a) - o 「#{naughts_name}」
-        (b) - x 「#{crosses_name}」
-        (c) - random
-      Enter a, b, or c >#{' '}
-    HEREDOC
-  end
-
   def decide_order_choice(naughts_name, crosses_name)
-    prompt = (create_order_message naughts_name, crosses_name).chomp
-    error_message = 'please enter a valid choice!'
+    prompt = (@game.printer.create_order_message naughts_name, crosses_name)
+             .chomp
+    error_message = 'please enter a, b or c!'
     options = %w[a b c A B C]
 
     get_input prompt, error_message, options
@@ -80,8 +59,8 @@ class GameInitializer
   end
 
   def set_up_players(naughts_name, crosses_name)
-    player_naughts = Player.new naughts_name
-    player_crosses = Player.new crosses_name
+    player_naughts = Player.new 'o', naughts_name
+    player_crosses = Player.new 'x', crosses_name
 
     @game.players = [player_naughts, player_crosses]
   end

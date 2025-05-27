@@ -695,3 +695,140 @@ Ruby is complaining that the cyclomatic complexity of `perform_action` is too hi
   - e - terminate program
 
 I should eventually develop an abstraction that manages this properly, but for now I'll focus on getting the basic logic working, so I'll use a simple `case` statement.
+
+---
+
+When printing the scores I want them to be formatted neatly, for example
+
+```
+ROUND: 5
+WINS:
+     「alice (o)」: 3
+     「bob (x)」  : 1
+```
+
+I think I first need to find the longest name, and then add as many spaces after the short name as the difference in the lengths of the names.
+
+[The result](./demons/format_scores.rb) ended up being about 70 lines of code. Shoving that into `Game` or `LogicHandler` would bloat their size to way over 100 lines, so I'd need to write a separate class for it.
+
+What would a logging class be in charge of? drawing stuff in the console, things like the help menu and scores. Should this class also be in charge of drawing the board? I'll keep the drawing of the board in the board class.
+
+The `play` funcion of `LogicHandler` is not quite there yet
+
+```
+play() {
+     while this.game.is_running {
+          this.move
+
+          if this.restarted_game
+               this.restart
+          else
+               this.update
+     }
+}
+```
+
+`restart` hasn't been written, and `update` is just
+
+```
+update() {
+     winner = this.game.board.compute_winner
+
+     reset unless winner.null?
+}
+```
+
+I could think more about those functions, but I think I can finish `perform_action` now. I think I only need to figure out how to do `'k'` and `'e'`.
+
+---
+
+Resetting everything should leave no trace of the current session, so it would be better to just call `GameInitializer#set_up_game`.
+
+A simple way to do this would be by having a `resetted_everything` in `LogicHandler`, then do
+
+```
+perform_action(option) {
+     switch option {
+          // rest of the fucking...
+          when 'k'
+               this.resetted_everything = true
+          // rest of the fucking...
+     }
+}
+
+play() {
+     while this.game.is_running {
+          this.move
+
+          if this.restarted_game
+               this.restart
+          else if this.resetted_everything
+               this.game.is_running = false
+          else
+               this.update
+     }
+
+     if this.resetted_everything {
+          this.resetted_everything = false
+          this.game.start
+     }
+}
+```
+
+---
+
+I think I have a system that kind of handles restarting and terminating. Now I just need to implement the `update` method.
+
+What does this method do? it currently looks like this
+
+```
+update() {
+     winner = this.game.board.compute_winner
+
+     restart unless winner.nil?
+}
+```
+
+it should also switch the turn if there's no winner, so
+
+```
+update() {
+     winner = this.game.board.compute_winner
+
+     this.change_turn
+
+     restart unless winner.nil?
+}
+```
+
+What's `restart`? it's definitely different from `reset` which resets the game to what it was at the beginning.
+
+What was the state at the beginning exactly? I want to `reset`. I don't have to update the players, as their scores, name, or marker don't change unless the round ends.
+
+I want to set the turn to what it was at the beginning, that's what the `Round` object is there for.
+
+I also want to reset the board. I can just throw away the current one and buy a new one.
+
+That's it for `reset` for now.
+
+`restart`. It currently seems to be used for two different things, which may be incorrect; we call it if there's a winner, and if `restarted_game` is true.
+
+The first case should make it so that the game moves to the next round, so the the players will be the same objects, but with one more tie, xor with one with an extra win.
+
+The other one is called when the players enter `'r'`, indicating that they want to restart the current game, but keep their current identities.
+
+What's a better name for the first action? `advance_to_next_round` maybe.
+
+What does this method do? This method is called when the game is over, which is when there's a tie, or when there's a winner.
+
+If there's a winner we increase the corresponding player's score, otherwise we increase the `ties` variable in the `Game` object. We also reset the board, and switch the turns. If the game that just finished was started by x, the new one will be started by o. We find who the next first player is with the `Round` object.
+
+The winner is currently being returned as a character?, so `'o'` or `'x'` or `nil`, so there's no support for ties. I could make the `compute_winner` method return a hash with more info, or I could do add a `full?` method to the `Board`, then if there's no winner, and `board.full?` is true, we can be sure there's a tie.
+
+---
+
+How do I compute the winner? I can hardcode the winning combinations as arrays of indices.
+
+I can go through each one of the hardcoded values, and if one is valid, I return the value at the first index. What does it mean for a combination to be valid, or winning? for all elements to be the same.
+
+Does returning from an `each` in ruby return from the array?
