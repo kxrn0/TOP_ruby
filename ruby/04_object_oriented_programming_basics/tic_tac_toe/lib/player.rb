@@ -2,7 +2,8 @@
 
 # The player class, keeps track of name and score.
 class Player
-  attr_reader :name, :wins, :marker
+  attr_accessor :wins
+  attr_reader :name, :marker
 
   def initialize(marker, name)
     @marker = marker

@@ -23,12 +23,15 @@ class LogicHandler
   end
 
   def advance_to_next_round(winner)
-    is_tie = winner.nil && @game.board.full?
+    is_tie = winner.nil? && @game.board.full?
 
     if is_tie
       @game.ties += 1
+
+      puts "it's a tie!"
     else
-      player = @game.players.find { |player| player.marker == marker }
+
+      player = @game.players.find { |player| player.marker == winner }
 
       player.wins += 1
     end
@@ -60,7 +63,11 @@ class LogicHandler
 
     change_turn
 
-    restart winner unless winner.nil?
+    over = @game.board.full? || winner.nil? == false
+
+    return unless over
+
+    advance_to_next_round winner
   end
 
   def update_board(cell_number)

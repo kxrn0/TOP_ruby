@@ -2,6 +2,8 @@
 
 # Class for the board
 class Board
+  attr_reader :show_cell_numbers
+
   WINNING_COMBINATIONS = [
     [0, 1, 2],
     [3, 4, 5],
@@ -29,16 +31,23 @@ class Board
   def compute_winner
     WINNING_COMBINATIONS.each do |combi|
       marker = @cells[combi[0]]
-      wins = combi.all? { |idx| @cells[idx] == marker }
+      wins = combi.all? do |idx|
+        @cells[idx].nil? == false &&
+          @cells[idx] == marker
+      end
 
       return marker if wins
     end
+
+    nil
   end
 
   def taken
     taken_cells = []
 
-    @cells.each_with_index { |cell, idx| taken_cells.push idx unless cell.nil? }
+    @cells.each_with_index do |cell, idx|
+      taken_cells.push(idx + 1) unless cell.nil?
+    end
 
     taken_cells.map(&:to_s)
   end
@@ -48,7 +57,7 @@ class Board
     @cells[index] = marker
   end
 
-  def board_full?
+  def full?
     @cells.none?(&:nil?)
   end
 end

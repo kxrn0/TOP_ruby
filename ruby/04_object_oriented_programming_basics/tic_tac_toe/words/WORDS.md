@@ -832,3 +832,61 @@ How do I compute the winner? I can hardcode the winning combinations as arrays o
 I can go through each one of the hardcoded values, and if one is valid, I return the value at the first index. What does it mean for a combination to be valid, or winning? for all elements to be the same.
 
 Does returning from an `each` in ruby return from the array?
+
+---
+
+```
+     |     |
+     |     |
+____1|____2|____3
+     |     |
+     |  o  |
+____4|____5|____6
+     |     |
+     |     |  x
+    7|    8|    9
+```
+
+How do I print a board? I tried not overcomplicating it, and writting each cell, which means checking if there's a marker, if I should show the cell number, if the cell is part of a winning combination. I tried doing that in a big `HEREDOC`, which was cumbersome, and prone to errors, and rubocop rightfully complained about it.
+
+I can have a method that builds cells. A cell is only the right wall, floor, and optional cell number and marker, so
+
+```
+     |
+  x  |
+____3
+```
+
+I can tell the method to not render the right wall or floor, or both like with cell 9.
+
+I can do something like
+
+```
+render_board(board) {
+     size = 3
+     bostr = ''
+
+     for y = 0; y < size; y++ {
+          for x = 0; x < size; x++ {
+               render_wall = x < size - 1
+               render_floor = y < size - 1
+               index = x + y * size
+               marker = board[idx]
+               number = index + 1
+               cell = render_cell number, marker, render_wall, render_floor
+
+               bostr += cell
+          }
+
+          bostr += '\n'
+     }
+
+     bostr
+}
+```
+
+I think that would work.
+
+---
+
+[It doesn't work](./demons/board_printer.rb)
