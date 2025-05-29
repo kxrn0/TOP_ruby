@@ -1,9 +1,8 @@
-# frozen-string-literal: true
+# frozen_string_literal: true
 
-# Class for the board
+# it keeps track of the board state,
+# and has some board methods
 class Board
-  attr_reader :show_cell_numbers
-
   WINNING_COMBINATIONS = [
     [0, 1, 2],
     [3, 4, 5],
@@ -17,15 +16,41 @@ class Board
 
   def initialize
     @cells = Array.new 9
-    @show_cell_numbers = true
-  end
-
-  def toggle_cell_numbers
-    @show_cell_numbers = !@show_cell_numbers
   end
 
   def draw
-    puts "\nboard..."
+    puts "
+       |     |
+      #{@cells[0]} |  #{@cells[1]}   |  #{@cells[2]}
+      0|    1|    2
+  -----.-----.-----
+       |     |
+      #{@cells[3]} |  #{@cells[4]}   |  #{@cells[5]}
+      3|    4|    5
+  -----.-----.-----
+       |     |
+      #{@cells[6]} |  #{@cells[7]}   |  #{@cells[8]}
+      6|    7|    8
+  "
+  end
+
+  def full?
+    @cells.none?(&:nil?)
+  end
+
+  def taken
+    numbers = []
+
+    @cells.each_with_index do |value, index|
+      numbers.push (index + 1).to_s unless value.nil?
+    end
+
+    numbers
+  end
+
+  def set(cell_number, marker)
+    index = cell_number.to_i - 1
+    @cells[index] = marker
   end
 
   def compute_winner
@@ -40,24 +65,5 @@ class Board
     end
 
     nil
-  end
-
-  def taken
-    taken_cells = []
-
-    @cells.each_with_index do |cell, idx|
-      taken_cells.push(idx + 1) unless cell.nil?
-    end
-
-    taken_cells.map(&:to_s)
-  end
-
-  def set_cell(number, marker)
-    index = number - 1
-    @cells[index] = marker
-  end
-
-  def full?
-    @cells.none?(&:nil?)
   end
 end
