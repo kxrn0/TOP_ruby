@@ -163,3 +163,114 @@ game.start
 ```
 
 I think most stuff is done, I only need to figure out how to print the board.
+
+I a past life I tried building the cells one by one, and then joining them, however that's clearly hard to do given that the pieces of text have `'\n'` at the end, so you can't just join them.
+
+I think a similar approach would work but building row by row.
+
+A row is composed of three layers
+
+```
+     |     |
+  o  |     |  x
+____1|____2|____3
+```
+
+```
+to_s() {
+     width = 3
+     height = 3
+     layers = 3
+     grid = ''
+
+     height.times y => {
+          row = ''
+
+          layers.times l => {
+               layer = ''
+
+               width.times x => {
+                    index = x + y * width
+                    cell = ''
+
+                    switch l {
+                         when 1 {
+                              cell = ' ' * 5
+                         }
+                         when 2 {
+                              value = this.cells[index]
+                              marker = value.null? ' ' : value
+                              spaces = ' ' * 2
+
+                              cell = "${spaces}${marker}${spaces}"
+                         }
+                         when 3 {
+                              unders = '_' * 4
+                              number = (index + 1).to_s
+
+                              cell += "${unders}${number}"
+                         }
+                    }
+
+                    wall = x == width - 1 ? '' : '|'
+                    cell += wall
+
+                    layer += cell
+               }
+
+               row += layer
+          }
+
+          grid += row
+     }
+
+     grid
+}
+```
+
+that's certainly way more characters than
+
+```ruby
+  def draw
+    puts "
+       |     |
+      #{@cells[0] || ' '} |  #{@cells[1] || ' '}   |  #{@cells[2] || ' '}
+      0|    1|    2
+  -----.-----.-----
+       |     |
+      #{@cells[3] || ' '} |  #{@cells[4] || ' '}   |  #{@cells[5] || ' '}
+      3|    4|    5
+  -----.-----.-----
+       |     |
+      #{@cells[6] || ' '} |  #{@cells[7] || ' '}   |  #{@cells[8] || ' '}
+      6|    7|    8
+  "
+  end
+```
+
+The pseudocode doesn't quite work. I managed to fix the bugs, now there's a last bug. The numbers at the bottom have to be the same lenght. I shoudln't be overcomplicating this as much as I am, but the fix seems to take just a bit of effort to leave it just like that.
+
+If I print a board of dimensions 5x4 the result is
+
+```
+     |     |     |     |
+     |  x  |  x  |  o  |
+____1|____2|____3|____4|____5
+     |     |     |     |
+     |     |  o  |  x  |  o
+____6|____7|____8|____9|____10
+     |     |     |     |
+  x  |  o  |  x  |     |
+____11|____12|____13|____14|____15
+     |     |     |     |
+     |     |     |  o  |
+    16|    17|    18|    19|    20
+```
+
+The solution is add a padding of however many `'-'` it takes to make the bottom number have the same length as the longest bottom.
+
+The longest bottom is `gest = @width * @height`, if the current number is `n`, then the number of padding `'-'`s we need is `gest.to_s.size - n.to_s.size`. I half want to cache `gest` while stringifying the board, but don't want to make it an instance variable so it'd have to be passed around as a method parameter, but that'd make things a bit harder to read, so I think in the end I should compute all those in the fly.
+
+The first attempt failed because I forgot I had to pad the other two layers as well.
+
+How do I distribute the padding in the middle layer? is it possible to distribute it evenly? This is getting out of hand. The board will always be 3x3, so the current solution works perfectly fine for it.

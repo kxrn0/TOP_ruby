@@ -8,7 +8,7 @@ require_relative 'player'
 # call the instance method`start` to start the game
 class Game
   OPTIONS = ((1..9).to_a.map(&:to_s) + ['exit']).freeze
-  DEEP_SLEEP = 1
+  DEEP_SLEEP = 0.5
 
   include Inputable
 
@@ -125,12 +125,16 @@ class Game
     choice == 'yes'
   end
 
+  def draw_board
+    puts "\n#{@board}"
+  end
+
   def game_loop
     while @is_running
       set_up
 
       while @is_gaming
-        @board.draw
+        draw_board
 
         handle_input
 
@@ -138,6 +142,7 @@ class Game
       end
 
       @is_running = play_again? if @is_running
+
     end
   end
 end

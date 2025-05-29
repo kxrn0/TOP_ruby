@@ -1,56 +1,13 @@
-# frozen_string_literal: true
+# frozen-string-literal: true
 
-# it keeps track of the board state,
-# and has some board methods
+# simple board class
 class Board
-  WINNING_COMBINATIONS = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ].freeze
+  attr_accessor :width, :height, :cells
 
-  def initialize
-    @cells = Array.new 9
-    @width = 3
-    @height = 3
-  end
-
-  def full?
-    @cells.none?(&:nil?)
-  end
-
-  def taken
-    numbers = []
-
-    @cells.each_with_index do |value, index|
-      numbers.push (index + 1).to_s unless value.nil?
-    end
-
-    numbers
-  end
-
-  def set(cell_number, marker)
-    index = cell_number.to_i - 1
-    @cells[index] = marker
-  end
-
-  def compute_winner
-    WINNING_COMBINATIONS.each do |combi|
-      marker = @cells[combi[0]]
-      wins = combi.all? do |idx|
-        @cells[idx].nil? == false &&
-          @cells[idx] == marker
-      end
-
-      return marker if wins
-    end
-
-    nil
+  def initialize(width, height)
+    @width = width
+    @height = height
+    @cells = Array.new width * height
   end
 
   def to_s
@@ -78,11 +35,22 @@ class Board
     "#{spaces}#{marker}#{spaces}"
   end
 
+  def compute_padding(number)
+    longest_size = (@width * @height).to_s.size
+    current_size = number.to_s.size
+    diff = longest_size - current_size
+
+    '_' * diff
+  end
+
   def build_cell_layer3(index, row_number)
     floor_tile = row_number < @height - 1 ? '_' : ' '
     floor = floor_tile * 4
+    number = index + 1
+    padding = compute_padding number
+    bottom = "#{padding}#{number}"
 
-    "#{floor}#{index + 1}"
+    "#{floor}#{bottom}"
   end
 
   def build_cell_layer(layer_number, index, row_number)
@@ -128,3 +96,20 @@ class Board
     row
   end
 end
+
+width = 5
+height = 4
+board = Board.new width, height
+
+cells = [
+  nil, 'x', 'x', 'o', nil,
+  nil, nil, 'o', 'x', 'o',
+  'x', 'o', 'x', nil, nil,
+  nil, nil, nil, 'o', nil
+]
+
+board.cells = cells
+
+in_print = board.to_s
+
+puts in_print
