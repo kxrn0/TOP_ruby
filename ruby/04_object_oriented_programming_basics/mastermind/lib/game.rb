@@ -1,165 +1,129 @@
 # frozen-string-literal: true
 
-require_relative './inputable'
+require_relative 'inputable'
+require_relative 'ai_coder'
+require_relative 'human_coder'
+require_relative 'ai_guesser'
+require_relative 'human_guesser'
 
-INTRO = <<~HEREDOC
-  I created a four-letter code with the characters [a, b, c, d, e, f].
-  Your task is to crack it.
-
-  For every guess I'll provide some hints.
-
-  A + means a letter is in the correct spot.
-  A - means a letter is in the code, but in the wrong spot.
-
-  You have 12 guesses.
-
-  Enter a guess, or 'exit' to terminate the program (not recommended).
-
-HEREDOC
-
-CHOICES = %w[a b c d e f].freeze
-
-CODE_SIZE = 4
-
-INIT_GUESSES = 12
-
-# mastermind game class
-# call `start` to start the game
+# Mastermind game
+# Call `start` to start the game
 class Game
+  attr_reader :guesses
+
   include Inputable
 
+  INTRO = <<~HEREDOC
+    The game consists of cracking a #{Coder::CODE_SIZE} letter code composed of the characters #{Coder::PEGS}
+
+    For every guess there will be some hints.
+
+    A + means a letter is in the correct spot.
+    A - means a letter is in the code, but in the wrong spot.
+
+    The guesser has 12 guesses.
+
+    Enter a guess, or 'exit' to terminate the program (not recommended).
+  HEREDOC
+
+  INIT_GUESSES = 12
+
   def initialize
-    @code = ''
+    @coder = nil
+    @guesser = nil
     @guesses = 0
     @running = true
+    @gaming = true
+    @terminated = false
   end
 
-  def start
+  def play
     puts INTRO
 
-    reset
-    game_loop
+    while @running
+      setup
+      game_loop
+
+      @running = play_again? unless @terminated
+    end
   end
 
   private
 
-  def reset_code
-    @code = ''
-
-    CODE_SIZE.times { @code += CHOICES.sample }
-  end
-
-  def reset
-    reset_code
-    @guesses = INIT_GUESSES
-  end
-
   def play_again?
     prompt = 'Play again (yes / no)? > '
-    error_message = "Enter only 'yes' or 'no'!"
+    error_message = "Please enter 'yes' or 'no'!"
     options = %w[yes no]
-    choice = get_input prompt, error_message, options
+    input = get_input prompt, error_message, options
 
-    @running = choice == 'yes'
+    input == 'yes'
+  end
+
+  def terminate
+    @gaming = false
+    @running = false
+    @terminated = true
   end
 
   def handle_game_over(won)
-    result = won ? 'won' : 'lost'
+    state = won ? 'WIN' : 'LOST'
 
-    puts "\nGAME OVER! You #{result}!"
+    puts "\nGAME OVER! YOU #{state}!"
 
-    puts "The code was #{@code}!" unless won
+    puts "THE CODE WAS #{@coder.code}" unless won
 
-    choice = play_again?
-
-    reset if choice
-
-    @running = choice
+    @gaming = false
   end
 
-  def compute_pluses(guess)
-    count = 0
-
-    @code.size.times do |idx|
-      count += 1 if guess[idx] == @code[idx]
-    end
-
-    count
-  end
-
-  def clear_pluses(guess)
-    guess = guess.split ''
-    code = @code.split ''
-
-    code.size.times do |idx|
-      code[idx] = guess[idx] = nil if code[idx] == guess[idx]
-    end
-
-    [guess, code]
-  end
-
-  def count_misses(guess, code)
-    count = 0
-
-    code.size.times do |idx|
-      next if code[idx].nil?
-
-      index = guess.index code[idx]
-
-      unless index.nil?
-        guess[index] = nil
-        count += 1
-      end
-    end
-
-    count
-  end
-
-  def compute_minuses(guess)
-    guess, code = clear_pluses guess
-
-    count_misses guess, code
-  end
-
-  def compute_hints(guess)
-    pluses = compute_pluses guess
-    minuses = compute_minuses guess
-
-    "#{'+ ' * pluses}#{'-' * minuses}"
-  end
-
-  def give_hints(guess)
-    hints = compute_hints guess
-    puts "hints: #{hints}"
-  end
-
-  def act_on_input(input)
-    if input == 'exit'
-      @running = false
-    elsif input == @code
-      handle_game_over true
-    else
-      give_hints input
-    end
-  end
-
-  def update
+  def handle_guess(guess)
     @guesses -= 1
 
-    return unless @guesses.zero?
-
-    handle_game_over false
+    if @guesses.zero?
+      handle_game_over false
+    else
+      @guesser.give @coder.hints guess
+    end
   end
 
-  def receive_input
-    print "enter guess (#{@guesses} / 12) > "
-    gets.chomp
+  def handle_input(input)
+    if input == 'exit'
+      terminate
+    elsif input == @coder.code
+      handle_game_over true
+    else
+      handle_guess input
+    end
   end
 
   def game_loop
-    while @running
-      act_on_input receive_input if @guesses > 1
-      update if @running
+    handle_input @guesser.guess while @gaming
+  end
+
+  def human_coder?
+    prompt = 'Do you want to be the guesser (yes / no)? > '
+    error_message = "Please enter 'yes' or 'no'!"
+    options = %w[yes no]
+    choice = get_input prompt, error_message, options
+
+    choice == 'no'
+  end
+
+  def setup_players
+    if human_coder?
+      @coder = HumanCoder.new
+      @guesser = AIGuesser.new self
+    else
+      @coder = AICoder.new
+      @guesser = HumanGuesser.new self
     end
+  end
+
+  def setup
+    setup_players
+
+    @coder.reset_code
+
+    @gaming = true
+    @guesses = INIT_GUESSES
   end
 end
