@@ -288,4 +288,78 @@ class Coder {
 
 ### `InputHandler`
 
-The `Player` above already makes sure the only input that flows from the human to the program is of the expected kind.
+The `Player` above already makes sure the only input that flows from the human to the program is of the expected kind. Still, we still need to know where to send the input to.
+
+If the human enters a command like `!s` that wouldn't be considered a game move; the number of guesses, and state of letters wouldn't change. The pattern I'm thinking about may only apply to turn based multiplayer games, so I don't think we'll see the following pattern in here
+
+```
+done = false
+
+until done {
+  input = gets
+
+  if input_advances_the_state_of_game input {
+    done = true
+    // rest of the fucking...
+  } else
+    perform_side_action input
+}
+```
+
+who handles the input? or whatever?
+
+#### `!n`
+
+We start a new game. If this is entered while a game is in progress, we first ask the human if they want to discard the current game.
+
+The `Player` is disposable, the `Coder` is disposable, the `InputHandler` and `FileManager` aren't necessarily disposable, but they should be kind of stateless (they still could hold a reference to the current `Game` object), so they can be disposable as well, thus the only one who can respond to this command is the `Game` instance.
+
+#### `!s`
+
+I think the `Game` should get this command, but it itself calls the `FileManager` like
+
+```
+class Game {
+  // rest of the fucking...
+
+  print_games() {
+    savedGames = this.fileManager.read_saved_games
+
+    puts savedGames
+  }
+
+  // rest of the fucking...
+}
+```
+
+#### `!l`
+
+Similar to above, this command calls a method of `Game` that does stuff like using its `FileManager` to load the game data, and reset the game state.
+
+#### `!d`
+
+Similar to above.
+
+#### `!c`
+
+The `Game` instance has to take this one, as it has the data that needs to be saved.
+
+#### `!h`
+
+`Game`
+
+#### `!e`
+
+`Game`
+
+### `FileManager`
+
+It has methods to operate on the files.
+
+---
+
+## Implementation
+
+I've written some code, however I overlooked some stuff, so I'll probably have to rewrite some parts.
+
+In the sketch above, the prompt is `>` before the game starts, and it switches to `(8 / 8) > ` once the game starts. I shouldn't overcomplicate things like this. Instead, I'll make it so that a game starts the moment `play` is called on the `Game` instance.

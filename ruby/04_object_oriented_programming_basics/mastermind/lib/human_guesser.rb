@@ -31,7 +31,8 @@ class HumanGuesser
   def valid_guess
     print "\nenter guess (#{@game.guesses} / #{Game::INIT_GUESSES}) > "
     input = gets.chomp.downcase
-    is_code = input =~ /^[abcdef]{4}$/
+    reg = /^[abcdef]{4}$/
+    is_code = reg.match? input
     is_exit = input == 'exit'
     is_valid = is_exit || is_code
 
