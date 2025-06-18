@@ -363,3 +363,118 @@ It has methods to operate on the files.
 I've written some code, however I overlooked some stuff, so I'll probably have to rewrite some parts.
 
 In the sketch above, the prompt is `>` before the game starts, and it switches to `(8 / 8) > ` once the game starts. I shouldn't overcomplicate things like this. Instead, I'll make it so that a game starts the moment `play` is called on the `Game` instance.
+
+Who is responsible for handling `show_games`? I could put it in the `Game`, but that class is growing quite fast, and there are many methods left to implement, so it may go over the legal line limit. It could be argued that the `FileManager` should take care of that.
+
+I want to print the names of the games in chronological order from when they were created, so older games should come last.
+
+When serializing a game I could store their creation date, then when reading them I can deserialize them, and sort them by creation date. I don't need all the data associated with a game to print its name to the screen.
+
+First of all, how do I parse a json file? In the given [tutorial](https://zetcode.com/lang/rubytutorial/io/) there's how to read a file line by line, and I could do something like
+
+```ruby
+lines = ''
+
+File.readlines('data.json').each do |line|
+  lines += line
+
+  puts line
+end
+
+puts JSON.parse lines
+```
+
+but that seems silly, there should be a more elegant way of doing this.
+
+After looking around I found [this](https://hackernoon.com/ruby-how-to-readwrite-json-file-a23h3vxa) tutorial. Interestingly enough it uses the `read` method, which is part of the `File` superclass, so it's a bit confusing.
+
+I'm confused. The `read` method of the `File` class seems to return the contents of a file as a string, it doesn't create a `File` instance object, so there's no need to `close` it.
+
+Now I'm confused about something else. I naively did
+
+```
+parse(entry) => JSON.parse File.read entry
+
+games = []
+Dir.entries("games").each entry => games.push parse entry
+```
+
+but it certainly doesn't work because `parse` assumes the `entry` is in the same directory the script is run. The solution should be to pass the full relative path. I can fix it by making the parameter to `parse` be `"./games/#{entry}"`, but I wonder if there's a more elegant way.
+
+There's also the issue that `Dir.entries` returns `.` and `..` as well. I can fix that by checking that the entry ends in `.json`, but I feel that since ruby is supposed to be very convenient, there should be a way to get only the files. There doesn't seem to be such a method.
+
+I want to save the `created_at` as the number of Epoch Seconds. How do I parse a value like this as a date? If I do
+
+```ruby
+now = Time.now.to_i
+
+puts Time.new now
+```
+
+I get
+
+```
+=> 1749660126-01-01 00:00:00 -0600
+```
+
+which is not what I want.
+
+Apparently there's the `Time::at` method, which does what I want.
+
+---
+
+How do I save a game? I want the user enter a name for the game, and then I'll make a hash that will be passed to the `FileManager` for serialization, the result will be stored in a json file.
+
+What will this hash look like? To hydrate the contents of a json file into a full fledged game I need some data
+
+- All the state variables of the `Coder` instance.
+- The `lives` for the `Player` instance.
+
+I think that's it.
+
+At this point I've written untested code that saves games, and displays available files. I just need to handle loading and deleting files.
+
+This program is supposed to be simple, however that could lead to some misunderstandings. When the user requests the games to be displayed they could get something like
+
+```
+S A V E D  G A M E S
+  (1) manhang - 2025-06-09 09:17:00
+  (2) gem - 2025-06-09 09:17:00
+  (3) mmm - 2025-06-09 09:17:00
+```
+
+if they delete the second game, and then ask for the second game to be loaded, they could get confused when the formerly third game is loaded. It's not something I'll try to fix, but maybe worth mentioning (most likely not).
+
+Thus, when the user wants to load or delete a game, we get all games in the `./games` directory, sort them by date from newest to oldest, and select the one at the index provided by the user. If the user provides an index out of bounds, we print an error.
+
+How do I capture the index? Browsing the documentation it seems like if I have a regex like `/!l\s(\d+)/` then I can do
+
+```ruby
+reg = /!l\s(\d+)/
+str = "!l 3"
+match = reg.match str
+idx = match ? match.captures[0].to_i : nil
+```
+
+At this point I'm using a lot of regex matching everywhere. I could validate the input more efficiently, however I should make this as simple and focused as possible. The point of this exercise is to work with the file system, thus I won't concern myself more than necessary with other stuff.
+
+---
+
+I have the index of the file I want to load/delete.
+
+### Delete
+
+There's the `delete` method of the `File` class, I just need to pass it the name of the file.
+I think I should get all json files in the games directory with `Dir.entries`, then make an array of hashes, each with two properties; the name of the file, and the creation date. I sort the hashes by creation date, and delete the one at the given index. I can stop early if the user provides an index out of bounds.
+
+### Load
+
+I'd do something similar; get all filenames of all json files in the games directory, sort them by creation date, and choose the one at the given index.
+
+---
+
+I doing something unnecessary, which is making an array of hashes with the filename and creation date, instead of an array of game date objects, or whatever. It doesn't make much sense here, however if I was working with massive amounts of data where each item occupies a lot of memory, trimming down the fat like this makes sense. However, as I said before, I should keep things simple, or at least easy to understand, and that pattern feels unecessarily complex, or at least not very intuitive, considering how little data each game stores, so we could load into memory thousands, or millions of such pieces of data, and there would probably be no decrease in performance.
+
+Still, I don't think I can make things simpler. I'd need to create a `GameData` class, and pass it down to a `Game` instance method to load a game or something that would probably make things more complicated. As such, I'll keep using the simpler approach that creates hashes on the fly.
+
+How do I select a random word from the dictionary? I can just load all words into an array, and select a random one.

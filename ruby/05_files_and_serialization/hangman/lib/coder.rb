@@ -2,7 +2,7 @@
 
 # Chooses the secred word, and provides hints.
 class Coder
-  attr_reader :available
+  attr_reader :available, :secret
 
   CHARS = [
     %w[q w e r t y u i o p],
@@ -10,17 +10,36 @@ class Coder
     %w[z x c v b n m]
   ].freeze
 
-  def initialize
-    @secret = 'word'
+  MAX_MISTAKES = 8
+
+  def hydrate(data)
+    @secret = data['secret']
+    @available = data['available']
+    @hits = data['hits']
+    @misses = data['misses']
+  end
+
+  def initialize(game)
+    @secret = game.file_manager.select_random_word
     @available = CHARS.clone.flatten
     @hits = []
     @misses = []
   end
 
+  def to_h
+    { secret: @secret, available: @available, hits: @hits, misses: @misses }
+  end
+
+  def guessed?
+    guess = hints_to_s.split(' ').join
+
+    @secret == guess
+  end
+
   def guess(char)
     @available = @available.filter { |c| c != char }
 
-    if @secret.incude? char
+    if @secret.include? char
       @hits.push char
 
       true
@@ -36,6 +55,7 @@ class Coder
 
     CHARS.each_with_index do |row, index|
       stroard += row_to_s row, index
+      stroard += "\n"
     end
 
     stroard
@@ -57,11 +77,11 @@ class Coder
 
   def choose_char(acter)
     if @hits.include? acter
-      '+'
+      ' + '
     elsif @misses.include? acter
-      '-'
+      ' - '
     else
-      acter
+      " #{acter} "
     end
   end
 
