@@ -1,89 +1,84 @@
+# frozen_string_literal: true
+
+# Enumerable module
 module Enumerable
   # Your code goes here
-
-  def my_each
-    for element in self
-      yield element
-    end
-  end
-
   def my_each_with_index
-    i = 0
-    while i < self.size
-      yield self[i], i
+    size.times do |index|
+      item = self[index]
 
-      i += 1
+      yield item, index
     end
 
     self
   end
 
   def my_select
-    pass = []
+    selected = []
 
-    self.each do |item|
-      pass.push item if yield item
+    size.times do |index|
+      item = self[index]
+
+      selected.push item if yield item
     end
 
-    pass
+    selected
   end
 
   def my_all?
-    self.each do |item|
-      value = yield item
-
-      return false unless value
+    size.times do |index|
+      return false unless yield self[index]
     end
 
     true
   end
 
   def my_any?
-    self.each do |item|
-      return true if yield(item)
+    size.times do |index|
+      return true if yield self[index]
     end
-    
+
     false
   end
 
   def my_none?
-    self.each do |item|
-      value = yield item
-
-      return false if value
+    size.times do |index|
+      return false if yield self[index]
     end
 
     true
   end
 
   def my_count
-    return self.size unless block_given?
+    return size unless block_given?
 
     count = 0
 
-    self.reduce(0) do |tot, curr|
-      tot + (yield(curr) ? 1 : 0)
+    size.times do |index|
+      count += 1 if yield self[index]
     end
+
+    count
   end
 
   def my_map
-    map = []
+    mapped = []
 
-    self.each do |item|
-      map.push(yield item)
+    size.times do |index|
+      mapped.push yield self[index]
     end
 
-    map
+    mapped
   end
 
-  def my_inject(initial_value = 0)
-    total = initial_value
+  def my_inject(initial_value = nil)
+    result = initial_value || 0
 
-    self.each do |item|
-      total = yield total, item
+    size.times do |index|
+      result = yield result, self[index]
     end
 
-    total
+    result
   end
 end
 
@@ -92,5 +87,11 @@ end
 # your enumerable module will have access
 # to this method
 class Array
-  include Enumerable
+  def my_each
+    size.times do |index|
+      yield self[index]
+    end
+
+    self
+  end
 end
