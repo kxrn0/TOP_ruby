@@ -1,204 +1,139 @@
-class List
-  def initialize
-    @head = nil
-  end
+# frozen_string_literal: true
 
-  def append(data)
-    node = Node.new data, nil
+require_relative 'lib/list'
 
-    unless @head
-      @head = node
+# append
 
-      return
-    end
+puts '------------------'
+puts 'appending...'
 
-    temp = @head
+list = List.new
+numbers = (5..10).to_a
 
-    while temp.next_node
-      temp = temp.next_node
-    end
+numbers.each { |n| list.append n }
 
-    temp.next_node = node
-  end
+puts list
 
-  def prepend(data)
-    node = Node.new data, @head
+# prepend
 
-    @head = node
-  end
+puts '------------------'
+puts 'prepending...'
 
-  def size
-    return 0 unless @head
+srebnum = (1..4).to_a.reverse
 
-    sum = 1
-    temp = @head
+srebnum.each { |n| list.prepend n }
 
-    while temp.next_node
-      sum += 1
+puts list
 
-      temp = temp.next_node
-    end
+# size
 
-    sum
-  end
+puts '------------------'
+puts 'sizing...'
 
-  def head
-    @head
-  end
+puts "size: #{list.size}"
 
-  def tail
-    return @head unless @head
+another_empty_list = List.new
 
-    temp = @head
+puts "size of empty list: #{another_empty_list.size}"
 
-    while temp.next_node
-      temp = temp.next_node
-    end
+another_empty_list.prepend 200
 
-    temp
-  end
+puts "size of list with one element: #{another_empty_list.size}"
 
-  def at(index)
-    current = 0
-    temp = @head
+# tail
 
-    while temp && current <= index
-      break if current == index
+puts '------------------'
+puts 'tailing...'
 
-      temp = temp.next_node
-      current += 1
-    end
+puts "tail: #{list.tail}"
 
-    raise "Index out of bounds!" if current < index
+empty_list = List.new
 
-    temp
-  end
+puts "tail of empty list: #{empty_list.tail}"
 
-  def pop
-    raise "List is empty!" unless @head
+empty_list.append 100
 
-    unless @head.next_node
-      node = @head
+puts "tail of list with one element: #{empty_list.tail}"
 
-      @head = nil
+# at
 
-      return node
-    end
+puts '------------------'
+puts 'atting...'
 
-    prev = nil
-    current = @head
-
-    while current.next_node
-      prev = current
-      current = current.next_node
-    end
-
-    prev.next_node = nil
-    current
-  end
-
-  def shift
-    raise "List is empty!" unless @head
-
-    @head = @head.next_node
-  end
-
-  def contains?(item = nil)
-    temp = @head
-
-    while temp
-      if block_given?
-        return true if yield temp.data
-      else
-        return true if item == temp.data
-      end
-
-      temp = temp.next_node
-    end
-
-    false
-  end
-
-  def find(item = nil)
-    index = 0
-    temp = @head
-
-    while temp
-      if block_given?
-        return index if yield temp.data
-      else
-        return index if item == temp.data
-      end
-
-      temp = temp.next_node
-      index += 1
-    end
-  end
-
-  def to_s
-    string = ""
-    temp = @head
-
-    while temp
-      string += "(#{temp.data}) -> "
-      temp = temp.next_node
-    end
-
-    string += "nil"
-  end
-
-  def insert_at(value, index)
-    return self.prepend value if index == 0
-
-    prev = nil
-    current = @head
-    currentIndex = 0
-
-    while current && currentIndex < index
-      currentIndex += 1
-      prev = current
-      current = current.next_node
-    end
-
-    raise "Index out of bounds!" if currentIndex < index
-
-    node = Node.new value, current
-    prev.next_node = node
-
-    node
-  end
-
-  def remove_at(index)
-    raise "List is empty!" unless @head
-
-    return self.shift if index == 0
-
-    prev = nil
-    current = @head
-    currentIndex = 0
-
-    while current.next_node && currentIndex < index
-      currentIndex += 1
-      prev = current
-      current = current.next_node
-    end
-
-    raise "Index out of bounds!" if currentIndex < index
-
-    prev.next_node = current.next_node
-    current
-  end
+(0...10).each do |n|
+  puts "##{n}: #{list.at n}"
 end
 
-class Node
-  attr_accessor :data, :next_node
+# pop
 
-  def initialize(data, next_node)
-    @data = data
-    @next_node = next_node
-  end
+puts '------------------'
+puts 'popping...'
 
-  def to_s
-    "#{data}"
-  end
+5.times { puts list.pop }
+puts list
+
+# contains?
+
+puts '------------------'
+puts 'containing...'
+
+(-10..10).each do |n|
+  puts "#{n}: #{list.contains?(n) ? 'true' : 'false'}"
 end
+
+# find
+
+puts '------------------'
+puts 'finding...'
+
+puts list
+
+(-10..10).each do |n|
+  puts "#{n}: #{list.find n}"
+end
+
+# insert_at
+
+puts '------------------'
+puts 'inserting at...'
+
+puts list
+list.insert_at 100, 2
+puts list
+
+begin
+  puts 'inserting at index 10'
+  list.insert_at 200, 10
+rescue StandardError => e
+  puts e
+end
+
+small_list = List.new
+
+small_list.prepend 10
+
+puts 'inserting into single element list'
+
+small_list.insert_at 0, 0
+
+puts small_list
+
+# remove_at
+
+puts '------------------'
+puts 'removing at...'
+
+list.remove_at 2
+puts list
+
+puts 'removing from 1 on small list'
+
+small_list.remove_at 1
+
+puts small_list
+
+puts 'removing from 0 on small list'
+
+small_list.remove_at 0
+
+puts small_list
