@@ -1,12 +1,11 @@
+# frozen_string_literal: true
+
+# Node
 class Node
-  attr_accessor :data, :next_node
+  attr_accessor :value, :next_node
 
-  def initialize(data, next_node)
-    @data = data
+  def initialize(value, next_node)
+    @value = value
     @next_node = next_node
-  end
-
-  def to_s
-    "#{data}"
   end
 end

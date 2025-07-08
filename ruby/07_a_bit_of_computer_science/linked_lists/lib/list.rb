@@ -17,15 +17,11 @@ class List
 
     node = node.next_node until node.next_node.nil?
 
-    new_node = Node.new value, nil
-
-    node.next_node = new_node
+    node.next_node = Node.new value, nil
   end
 
   def prepend(value)
-    new_node = Node.new value, @head
-
-    @head = new_node
+    @head = Node.new value, @head
   end
 
   def size
@@ -122,15 +118,7 @@ class List
   def insert_at(value, index)
     return prepend value if index.zero?
 
-    parent = nil
-    node = @head
-
-    until node.nil? || index.zero?
-      parent = node
-      node = node.next_node
-
-      index -= 1
-    end
+    parent, node = pair index
 
     insert_at_helper value, parent, node
   end
@@ -138,19 +126,26 @@ class List
   def remove_at(index)
     return shift if index.zero?
 
+    parent, node = pair index
+
+    remove_at_helper parent, node
+  end
+
+  private
+
+  def pair(index)
     parent = nil
     node = @head
 
     until node.nil? || index.zero?
       parent = node
       node = node.next_node
+
       index -= 1
     end
 
-    remove_at_helper parent, node
+    [parent, node]
   end
-
-  private
 
   def sneed(value)
     @head = Node.new value, nil

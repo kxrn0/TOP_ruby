@@ -1,78 +1,77 @@
-require_relative "./person"
-require_relative "../lib/hashtable"
+# frozen_string_literal: true
 
-people = HashTable.new
+require_relative '../lib/hashmap'
 
-puts "keys:"
-puts people.keys
-puts "values:"
-puts people.values
-puts "entries:"
-puts people.entries
-puts "length:"
-puts people.length
-puts "hash:"
-puts people
+map = HashMap.new
 
-puts "------------------"
+map.set('apple', 'red')
+map.set('banana', 'yellow')
+map.set('carrot', 'orange')
+map.set('dog', 'brown')
+map.set('elephant', 'gray')
+map.set('frog', 'green')
+map.set('grape', 'purple')
+map.set('hat', 'black')
+map.set('ice cream', 'white')
+map.set('jacket', 'blue')
+map.set('kite', 'pink')
+map.set('lion', 'golden')
 
-people.set "one", Person.new("One", 89)
-people.set "two", Person.new("Two", 54)
-people.set "three", Person.new("Three", 76)
-people.set "four", Person.new("Four", 90)
-people.set "five", Person.new("Five", 74)
+map.print_debug_info
 
-puts "keys:"
-puts people.keys
-puts "values:"
-puts people.values
-puts "entries:"
-puts people.entries
-puts "length:"
-puts people.length
-puts "hash:"
-puts people
+map.set('lion', 'yellow')
+map.set('dog', 'black')
+map.set('banana', 'golden')
 
-puts "------------------"
+map.print_debug_info
 
-people.set "three", Person.new("ThreeJS", 69)
+map.set('moon', 'silver')
 
-puts "length:"
-puts people.length
-puts "hash:"
-puts people
+map.print_debug_info
 
-two = people.get "two"
-six = people.get "six"
+# get
 
-puts "two:"
-puts two
-puts "six:"
-puts six
-puts "has three:"
-puts people.has? "three"
-puts "has seven:"
-puts people.has? "seven"
+puts 'getting...'
+puts '----------'
 
-puts "------------------"
+value = map.get 'elephant'
+puts "elephant: #{value}"
 
-puts "removing four..."
+value = map.get 'nothing'
+puts "nothing: #{value}"
 
-r1 = people.remove "four"
-r2 = people.remove "ten"
+# has?
 
-puts "four removed:"
-puts r1
-puts "ten removed:"
-puts r2
-puts "length:"
-puts people.length
-puts "hash:"
-puts people
+puts 'has?ing...'
+puts '----------'
 
-puts "clearing..."
+puts "has kite? #{map.has? 'kite'}"
+puts "has doro? #{map.has? 'doro'}"
 
-people.clear
+# remove
 
-puts "hash:"
-puts people
+puts 'removing...'
+puts '----------'
+
+puts 'removing ice cream...'
+map.remove 'ice cream'
+
+puts "has ice cream? #{map.has? 'ice cream'}"
+
+puts 'removing grape...'
+map.remove 'grape'
+
+puts "has grape? #{map.has? 'grape'}"
+
+puts 'removing doro...'
+map.remove 'doro'
+puts "has doro? #{map.has? 'doro'}"
+
+# keys/values/entries
+
+puts 'keysing/valuesing/entriesing...'
+puts '----------'
+
+puts "keys: #{map.keys}"
+puts "values: #{map.values}"
+puts "entries: #{map.entries}"

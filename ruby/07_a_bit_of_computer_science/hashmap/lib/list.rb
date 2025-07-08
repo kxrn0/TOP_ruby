@@ -1,184 +1,160 @@
-require_relative "node.rb"
+# frozen_string_literal: true
 
+require_relative 'node'
+
+# Linked list
 class List
+  attr_reader :head
+
   def initialize
     @head = nil
   end
 
-  def put(newData)
-    raise "No condition given!" unless block_given?
-
-    temp = @head
-
-    while temp
-      if yield temp.data
-        temp.data = newData
-
-        return true
-      end
-
-      temp = temp.next_node
-    end
-
-    self.append newData
-
-    return false
+  def empty?
+    @head.nil?
   end
 
-  def get
-    raise "No condition given!" unless block_given?
+  def each(&block)
+    node = @head
 
-    temp = @head
+    until node.nil?
+      block.call node.value
 
-    while temp
-      return temp.data if yield temp.data
-
-      temp = temp.next_node
+      node = node.next_node
     end
   end
 
-  def append(data)
-    node = Node.new data, nil
+  def append(value)
+    return sneed value if @head.nil?
 
-    unless @head
-      @head = node
+    node = @head
 
-      return
-    end
+    node = node.next_node until node.next_node.nil?
 
-    temp = @head
-
-    while temp.next_node
-      temp = temp.next_node
-    end
-
-    temp.next_node = node
+    node.next_node = Node.new value, nil
   end
 
-  def prepend(data)
-    node = Node.new data, @head
-
-    @head = node
+  def prepend(value)
+    @head = Node.new value, @head
   end
 
   def size
-    return 0 unless @head
+    count = 0
+    node = @head
 
-    sum = 1
-    temp = @head
-
-    while temp.next_node
-      sum += 1
-
-      temp = temp.next_node
+    until node.nil?
+      node = node.next_node
+      count += 1
     end
 
-    sum
-  end
-
-  def head
-    @head.data
+    count
   end
 
   def tail
-    return @head unless @head
+    return nil if @head.nil?
 
-    temp = @head
+    node = @head
 
-    while temp.next_node
-      temp = temp.next_node
-    end
+    node = node.next_node until node.next_node.nil?
 
-    temp.data
+    node.value
+  end
+
+  def at(index)
+    at_helper @head, index
   end
 
   def pop
-    raise "List is empty!" unless @head
+    parent = @head
+    node = parent.next_node
 
-    unless @head.next_node
-      node = @head
-
-      @head = nil
-
-      return node.data
+    until node.next_node.nil?
+      parent = node
+      node = node.next_node
     end
 
-    prev = nil
-    current = @head
+    parent&.next_node = nil
 
-    while current.next_node
-      prev = current
-      current = current.next_node
-    end
+    @head = nil if parent == @head
 
-    prev.next_node = nil
-    current.data
+    node&.value
   end
 
   def shift
-    raise "List is empty!" unless @head
-
     node = @head
-    @head = @head.next_node
-    node.data
+
+    @head = node&.next_node
+
+    node&.next_node = nil
+
+    node.value
   end
 
-  def remove
-    notFound = { found: false, value: nil }
+  def find(&test)
+    node = @head
 
-    raise "No condition given!" unless block_given?
+    until node.nil?
+      value = node.value
+      return value if test.call value
 
-    return notFound unless @head
-    if yield @head.data
-      found = { found: true, value: @head.data }
-
-      self.shift
-
-      return found
+      node = node.next_node
     end
-
-    prev = @head
-    current = @head.next_node
-
-    while current
-      if yield current.data
-        prev.next_node = current.next_node
-        found = { found: true, value: current.data }
-
-        return found
-      end
-
-      prev = current
-      current = current.next_node
-    end
-
-    notFound
   end
 
-  def to_a
-    raise "No condition given!" unless block_given?
+  def has?(&test)
+    node = @head
 
-    array = []
-    temp = @head
+    until node.nil?
 
-    while temp
-      array.push yield temp.data
+      return true if test.call node.value
 
-      temp = temp.next_node
+      node = node.next_node
     end
 
-    array
+    false
   end
 
-  def to_s
-    string = ""
-    temp = @head
+  def remove(&test)
+    parent, node = find_offending_node(&test)
 
-    while temp
-      string += "(#{temp.data}) -> "
-      temp = temp.next_node
+    return if node.nil?
+
+    if parent.nil?
+      @head = nil
+    else
+      parent&.next_node = node.next_node
+      node.next_node = nil
     end
 
-    string += "nil"
+    node.value
+  end
+
+  private
+
+  def find_offending_node(&test)
+    found = false
+    parent = nil
+    node = @head
+
+    until node.nil? || found
+      found = test.call node.value
+
+      break if found
+
+      parent = node
+      node = node.next_node
+    end
+
+    [parent, node]
+  end
+
+  def sneed(value)
+    @head = Node.new value, nil
+  end
+
+  def at_helper(node, index)
+    return node&.value if node.nil? || index.zero?
+
+    at_helper node.next_node, index - 1
   end
 end
