@@ -47,34 +47,34 @@ class MagicSeven
     step_four = divide_by_two(step_three)
     puts <<~HEREDOC
 
-           MAGIC SEVEN
+      MAGIC SEVEN
 
-           Magic Seven can take any random number and turn that number into the
-           number 7, using the same five mathematical operations every time!
+      Magic Seven can take any random number and turn that number into the
+      number 7, using the same five mathematical operations every time!
 
-           For example, let's start with the random number #{random_number}.
+      For example, let's start with the random number #{random_number}.
 
       1. Add nine:
           #{random_number} + 9 = #{step_one}
 
-           2. Take #1 answer and multiply by two:
-               #{step_one} * 2 = #{step_two}
+      2. Take #1 answer and multiply by two:
+          #{step_one} * 2 = #{step_two}
 
-           3. Take #2 answer and subtract four:
-               #{step_two} - 4 = #{step_three}
+      3. Take #2 answer and subtract four:
+          #{step_two} - 4 = #{step_three}
 
-           4. Take #3 answer and divide by two:
-               #{step_three} / 2 = #{step_four}
+      4. Take #3 answer and divide by two:
+          #{step_three} / 2 = #{step_four}
 
-           5. Take #4 answer and subtract the original random number:
-               #{step_four} - #{random_number} = #{play}
+      5. Take #4 answer and subtract the original random number:
+          #{step_four} - #{random_number} = #{play}
 
-           Step #5 will always be 7!
+      Step #5 will always be 7!
 
-         HEREDOC
+    HEREDOC
   end
 end
 
-game = MagicSeven.new
-game.play
-game.display_result
+# game = MagicSeven.new
+# game.play
+# game.display_result

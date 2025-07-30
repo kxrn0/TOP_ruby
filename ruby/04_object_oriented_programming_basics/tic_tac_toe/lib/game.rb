@@ -21,7 +21,7 @@ class Game
   end
 
   def start
-    game_loop
+    program_loop
   end
 
   private
@@ -94,7 +94,6 @@ class Game
   def print_end_message(winner)
     if winner.nil?
       puts "\n\nGAME OVER! it's a tie!"
-
     else
       puts "GAME OVER! 「#{winner}」 is the winner!"
 
@@ -125,24 +124,22 @@ class Game
     choice == 'yes'
   end
 
-  def draw_board
-    puts "\n#{@board}"
+  def program_loop
+    while @is_running
+      set_up
+      game_loop
+
+      @is_running = play_again? if @is_running
+    end
   end
 
   def game_loop
-    while @is_running
-      set_up
+    while @is_gaming
+      @board.draw_self
 
-      while @is_gaming
-        draw_board
+      handle_input
 
-        handle_input
-
-        update if @is_running
-      end
-
-      @is_running = play_again? if @is_running
-
+      update if @is_running
     end
   end
 end

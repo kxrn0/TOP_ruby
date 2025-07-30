@@ -1,13 +1,12 @@
+# frozen_string_literal: true
+
+# Calculator
 class Calculator
-  def add *numbers
-    numbers.reduce(0) { |total, current| total + current }
+  def add(*numbers)
+    numbers.reduce(0) { |sum, curr| sum + curr }
   end
 
   def multiply *numbers
-    numbers.reduce(1) { |total, current| total * current }
-  end
-
-  def substract a, b
-    a - b
+    numbers.reduce(1) { |prod, curr| prod * curr }
   end
 end

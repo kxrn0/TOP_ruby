@@ -76,7 +76,7 @@ describe 'equality assignment' do
 
   # remove the 'x' before running this test
   it 'amy is eql to bob' do
-    expect(amy).to eql(bob)    
+    expect(amy).to eql(bob)
   end
 
   # remove the 'x' before running this test
@@ -86,6 +86,6 @@ describe 'equality assignment' do
 
   # remove the 'x' before running this test
   it 'copy_cat is equal to amy' do
-    expect(copy_cat).to equal amy
+    expect(copy_cat).to equal(amy)
   end
 end

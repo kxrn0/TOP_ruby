@@ -5,37 +5,37 @@
 # a different file.
 
 # The file order to complete this lesson:
-# 1. Familarize yourself with the class in lib/10_drink.rb
+# 1. Familiarize yourself with the class in lib/10_drink.rb
 # 2. Complete spec/10_drink_spec.rb
 
 # If you are using VS Code, you can split the screen to see both files at
 # the same time (view menu -> editor layout).
 
-require_relative "../lib/10_drink"
+require_relative '../lib/10_drink'
 
 describe Drink do
-  describe "#initialize" do
+  describe '#initialize' do
     # The Drink class needs to have an attr_reader for both :type and :ounces.
-    context "when using default initialization" do
+    context 'when using default initialization' do
       subject(:default_drink) { Drink.new }
 
-      it "is water" do
-        expect(default_drink.type).to eq("water")
+      it 'is water' do
+        expect(default_drink.type).to eq('water')
       end
 
-      it "has 16 ounces" do
+      it 'has 16 ounces' do
         expect(default_drink.ounces).to eq(16)
       end
     end
 
-    context "when specifying the type and ounces" do
-      subject(:my_coffee) { Drink.new("coffee", 8) }
+    context 'when specifying the type and ounces' do
+      subject(:my_coffee) { Drink.new('coffee', 8) }
 
-      it "is coffee" do
-        expect(my_coffee.type).to eq("coffee")
+      it 'is coffee' do
+        expect(my_coffee.type).to eq('coffee')
       end
 
-      it "has 8 ounces" do
+      it 'has 8 ounces' do
         expect(my_coffee.ounces).to eq(8)
       end
     end
@@ -46,37 +46,37 @@ describe Drink do
     # changed to 'Beverage'. If that change were made, every time the word
     # 'Drink' was used, it would have to be changed to 'Beverage'.
 
-    context "when limiting future code changes" do
-      subject(:my_drink) { described_class.new("juice") }
+    context 'when limiting future code changes' do
+      subject(:my_drink) { described_class.new('juice') }
 
-      it "is juice" do
-        expect(my_drink.type).to eq("juice")
+      it 'is juice' do
+        expect(my_drink.type).to eq('juice')
       end
 
-      it "has 16 ounces" do
+      it 'has 16 ounces' do
         expect(my_drink.ounces).to eq(16)
       end
     end
   end
 
-  describe "#full?" do
-    context "when using magic matchers" do
+  describe '#full?' do
+    context 'when using magic matchers' do
       # When using a method that returns a boolean value & does not take any
       # parameters, you can use magic matchers.
       # http://testing-for-beginners.rubymonstas.org/rspec/matchers.html
 
-      context "when using default initialization" do
+      context 'when using default initialization' do
         subject(:default_drink) { described_class.new }
 
-        it "is full" do
+        it 'is full' do
           expect(default_drink).to be_full
         end
       end
 
-      context "when drink has 8 ounces" do
-        subject(:my_coffee) { described_class.new("coffee", 8) }
+      context 'when drink has 8 ounces' do
+        subject(:my_coffee) { described_class.new('coffee', 8) }
 
-        it "is not full" do
+        it 'is not full' do
           expect(my_coffee).not_to be_full
         end
       end
@@ -87,46 +87,48 @@ end
 # ASSIGNMENT
 
 describe Drink do
-  describe "#initialize" do
-    context "when type is specified and ounces is default" do
+  describe '#initialize' do
+    context 'when type is specified and ounces is default' do
       # Create an explicit subject, using 'described_class' and your choice of
       # beverage type.
-      subject(:my_drink) { described_class.new("beer") }
+      subject(:beverage) { described_class.new 'green tea' }
 
       # remove the 'x' before running this test
-      it "is your choice of beverage" do
-        expect(my_drink.type).to be("beer")
+      it 'is your choice of beverage' do
+        expected = 'green tea'
+
+        expect(beverage.type).to eq expected
       end
 
       # remove the 'x' before running this test
-      it "has 16 ounces" do
-        expect(my_drink).to be_full
+      it 'has 16 ounces' do
+        expected = 16
+
+        expect(beverage.ounces).to eq(expected)
       end
     end
   end
 
-  describe "#full?" do
-    context "when drink has 16 ounces or more" do
+  describe '#full?' do
+    context 'when drink has 16 ounces or more' do
       # Create an explicit subject, using 'described_class' and your choice of
       # beverage type.
-
-      subject(:my_drink) { described_class.new("beer") }
+      subject(:beverage) { described_class.new 'green tea' }
 
       # remove the 'x' before running this test
-      it "is full" do
-        expect(my_drink).to be_full
+      it 'is full' do
+        expect(beverage).to be_full
       end
     end
 
-    context "when drink has less than 16 ounces" do
+    context 'when drink has less than 16 ounces' do
       # Create an explicit subject, using 'described_class' and your choice of
       # beverage type. In addition, specify ounces to be any number under 16.
-
-      subject(:my_drink) { described_class.new("beer", 10) }
+      subject(:beverage) { described_class.new 'green tea', 10 }
 
       # remove the 'x' before running this test
-      it "is not full" do
-        expect(my_drink).not_to be_full
+      it 'is not full' do
+        expect(beverage).to_not be_full
       end
     end
   end

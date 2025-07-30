@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../lib/12_magic_seven"
+require_relative '../lib/12_magic_seven'
 
 # The file order to complete this lesson:
 # 1. Familiarize yourself with the class in lib/12_magic_seven.rb
@@ -8,7 +8,7 @@ require_relative "../lib/12_magic_seven"
 
 # Before learning any more complexities of testing, let's take a look at a
 # standard testing pattern: Arrange, Act, and Assert.
-# https://youtu.be/sCthIEOaMI8
+# https://youtu.be/f8gjbPLFnqU
 
 # 1. Arrange -> set up the test (examples: initializing objects, let
 #               variables, updating values of instance variables).
@@ -24,7 +24,7 @@ require_relative "../lib/12_magic_seven"
 # repetition is necessary in order for them to be easy to read. If you are using
 # rubocop, you can disable specific (or all) cops for certain files (or
 # directories) by adding a .rubocop.yml file.
-# https://docs.rubocop.org/rubocop/0.88/configuration.html#includingexcluding-files
+# https://docs.rubocop.org/rubocop/configuration.html#includingexcluding-files
 
 # When you start working on an existing code base, you will often become familiar
 # with the code by reading the tests.
@@ -33,16 +33,16 @@ describe MagicSeven do
   # This next line should be very familiar, and it is part of the 'Arrange' step.
   subject(:game) { described_class.new }
 
-  describe "#add_nine" do
+  describe '#add_nine' do
     # This test could be written as below (and it would pass):
-    it "returns 15" do
+    it 'returns 15' do
       expect(game.add_nine(6)).to eq(15)
     end
 
     # However, the above test is NOT very readable. For example, it does not
     # explain where '6' came from. So let's start with explaining
     # where '6' came from, as part of the 'Arrange' step.
-    it "returns 15" do
+    it 'returns 15' do
       random_number = 6
 
       # For the 'Act' step, we will be testing the result of the logic of adding
@@ -56,9 +56,9 @@ describe MagicSeven do
 
   # In addition, using a context to explain the conditions of the test makes
   # the output more readable.
-  describe "#multiply_by_two" do
-    context "when the previous step is 8" do
-      it "returns 16" do
+  describe '#multiply_by_two' do
+    context 'when the previous step is 8' do
+      it 'returns 16' do
         previous_step = 8 # Arrange
         result = game.multiply_by_two(previous_step) # Act
         expect(result).to eq(16) # Assert
@@ -69,86 +69,81 @@ describe MagicSeven do
   # ASSIGNMENT
   # Write a test for each of the following methods:
 
-  describe "#subtract_four" do
-    context "subtract four from the previous step" do
-      it "returns four less than the previous step" do
-        previous_step = rand(1..100)
-        expected = previous_step - 4
+  describe '#subtract_four' do
+    context 'when the previous step is 10' do
+      it 'returns 6' do
+        previous_step = 10
+        result = game.subtract_four previous_step
+        expected = 6
 
-        result = game.subtract_four(previous_step)
-
-        expect(result).to be expected
+        expect(result).to eq expected
       end
     end
   end
 
-  describe "#divide_by_two" do
-    context "divide the previous step by two" do
-      it "result is half the previous step" do
-        previous_step = rand(1..100)
-        expected = previous_step / 2
+  describe '#divide_by_two' do
+    context 'when the previous step is 10' do
+      it 'returns 5' do
+        previous_step = 10
+        result = game.divide_by_two previous_step
+        expected = 5
 
-        result = game.divide_by_two(previous_step)
-
-        expect(result).to be expected
+        expect(result).to eq expected
       end
     end
   end
 
   # The following tests will need you to create new instances of MagicSeven with
   # a specific value for the random_number.
-  describe "#subtract_random_number" do
-    context "subtracts random number" do
-      it "subtracts random number from instance value" do
-        random_number = rand(1..100)
-        expected = random_number - game.random_number
+  describe '#subtract_random_number' do
+    subject(:my_game) { described_class.new 10 }
 
-        result = game.subtract_random_number(random_number)
+    context 'when we subtract the set random number from 50' do
+      it 'returns 40' do
+        number = 50
+        result = my_game.subtract_random_number number
+        expected = 40
 
-        expect(result).to be expected
+        expect(result).to eq expected
       end
     end
   end
 
   # The #play method will always return seven! Test this game, using any
   # integer as the random_number. Update the context with the number.
-  describe "#play" do
-    subject(:game) { described_class.new(0) }
+  describe '#play' do
+    let(:seven) { 7 }
 
-    context "when the random number is 0" do
+    context 'when the random number is 177013' do
+      subject(:my_game) { described_class.new 177_013 }
+
       # remove the 'x' before running this test
-      it "will return 7" do
-        expected = 7
+      it 'will return 7' do
+        result = my_game.play
 
-        result = game.play
-
-        expect(result).to be expected
+        expect(result).to eq seven
       end
     end
 
-    context "when the random number is -1" do
-      subject(:game) { described_class.new(-1) }
+    context 'when the random number is 100' do
+      subject(:my_game) { described_class.new 177_013 }
 
       # remove the 'x' before running this test
-      it "will return 7" do
-        expected = 7
+      it 'will return 7' do
+        result = my_game.play
 
-        result = game.play
-
-        expect(result).to be expected
+        expect(result).to eq seven
       end
     end
 
-    context "when the random number is 1e9" do
-      subject(:game) { described_class.new 1e9.to_i }
+    context 'when the random number is 14' do
+      subject(:my_game) { described_class.new 14 }
 
       # remove the 'x' before running this test
-      it "will return 7" do
-        expected = 7
+      it 'will return 7' do
+        result = my_game.play
 
-        result = game.play
-
-        expect(result).to be expected
+        expect(result).to eq seven
       end
     end
   end

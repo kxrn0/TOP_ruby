@@ -5,14 +5,14 @@ describe Array do
   # group is a class. The 'subject' will be an instance of that class.
   # https://rspec.info/features/3-12/rspec-core/subject/implicit-subject/
 
-  # Note: Using an implicit subject is not recommended for most situations.
+  # NOTE: Using an implicit subject is not recommended for most situations.
   # The next lesson will cover explicit subjects, which are recommended over
   # implicit subjects.
 
-  context "when subject is implicitly defined" do
+  context 'when subject is implicitly defined' do
     # Type matchers can use be_a or be_an to increase readability.
     # https://rspec.info/features/3-12/rspec-expectations/built-in-matchers/types/
-    it "is an Array" do
+    it 'is an Array' do
       expect(subject).to be_an(Array)
     end
 
@@ -22,17 +22,17 @@ describe Array do
     it { is_expected.to be_an(Array) }
   end
 
-  context "when using predicate matchers" do
-    context "when using the empty? predicate method" do
+  context 'when using predicate matchers' do
+    context 'when using the empty? predicate method' do
       # A predicate method in Ruby ends with a ? and only returns true or false.
-      it "returns true" do
+      it 'returns true' do
         expect(subject.empty?).to eq true
       end
     end
 
     # RSpec can leverage this to create predicate matchers for any predicate method.
     # https://rspec.info/features/3-12/rspec-expectations/built-in-matchers/predicates/
-    it "is empty" do
+    it 'is empty' do
       expect(subject).to be_empty
     end
 
@@ -42,14 +42,14 @@ describe Array do
     it { is_expected.to be_empty }
   end
 
-  context "when a let variable is declared inside a context block" do
+  context 'when a let variable is declared inside a context block' do
     let(:numbers) { [3, 8, 9] }
 
-    it "has length of 3" do
+    it 'has length of 3' do
       expect(numbers.length).to eq(3)
     end
 
-    it "changes the length to 2" do
+    it 'changes the length to 2' do
       numbers.pop
       expect(numbers.length).to eq(2)
     end
@@ -70,32 +70,32 @@ end
 
 # ASSIGNMENT
 describe Array do
-  context "when updating an implicit subject" do
+  context 'when updating an implicit subject' do
     # remove the 'x' before running this test
-    it "is empty" do
+    it 'is empty' do
       # Write a test to expect the subject to be empty.
       expect(subject).to be_empty
     end
 
     # remove the 'x' before running this test
-    it "updates length to 1" do
+    it 'updates length to 1' do
       # Update the implicit subject to make this test pass.
-      subject.push 1
+      subject.push 100
       expect(subject.length).to eq(1)
     end
   end
 
-  context "when using one let variable on two tests" do
+  context 'when using one let variable on two tests' do
     # Make a let variable that will pass both tests.
-    let(:lucky_numbers) { [14, 14, 14] }
+    let(:lucky_numbers) { [38, 3, 1] }
 
     # remove the 'x' before running this test
-    it "has length of 3" do
+    it 'has length of 3' do
       expect(lucky_numbers.length).to eq(3)
     end
 
     # remove the 'x' before running this test
-    it "has sum of 42" do
+    it 'has sum of 42' do
       expect(lucky_numbers.sum).to eq(42)
     end
   end

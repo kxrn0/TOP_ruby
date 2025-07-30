@@ -64,6 +64,10 @@ class Board
     grid
   end
 
+  def draw_self
+    puts "\n#{self}"
+  end
+
   private
 
   def build_cell_layer1
@@ -108,7 +112,7 @@ class Board
     layer = ''
 
     @width.times do |x|
-      index = x + row_number * @width
+      index = x + (row_number * @width)
       layer += build_cell layer_number, index, x, row_number
     end
 

@@ -62,8 +62,7 @@ end
 describe Array do
   context 'when my_array has perfect values' do
     # Write a subject variable 'my_array' that passes all tests.
-    
-    subject(:my_array) { [-3, 42, 400, 98] }
+    subject(:my_array) { [-3, 40, 42, 0, 1000, 40] }
 
     # remove the 'x' before running this test
     it 'has a specific first value' do

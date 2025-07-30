@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../lib/13_input_output"
+require_relative '../lib/13_input_output'
 
 # The file order to complete this lesson:
 # 1. Familiarize yourself with the two classes in lib/13_input_output.rb
@@ -31,14 +31,14 @@ require_relative "../lib/13_input_output"
 describe NumberGame do
   subject(:game) { described_class.new }
 
-  describe "#initialize" do
-    context "when solution is initialized" do
-      it "is a number greater than or equal to 0" do
+  describe '#initialize' do
+    context 'when solution is initialized' do
+      it 'is a number greater than or equal to 0' do
         solution = game.solution
         expect(solution).to be >= 0
       end
 
-      it "is a number less than or equal to 9" do
+      it 'is a number less than or equal to 9' do
         solution = game.solution
         expect(solution).to be <= 9
       end
@@ -47,21 +47,23 @@ describe NumberGame do
 
       # Write a similar test to the one above, that uses a custom matcher
       # instead of <, >, =.
-      matcher :be_between do |min, max|
-        match { |num| num.between?(min, max) }
+      matcher :be_between_zero_and_nine do
+        match do |number|
+          number.between?(0, 9)
+        end
       end
 
       # remove the 'x' before running this test
-      it "is a number between 0 and 9" do
-        result = game.solution
+      it 'is a number between 0 and 9' do
+        solution = game.solution
 
-        expect(result).to be_between(0, 9)
+        expect(solution).to be_between_zero_and_nine
       end
     end
   end
 
-  describe "#game_over?" do
-    context "when user guess is correct" do
+  describe '#game_over?' do
+    context 'when user guess is correct' do
       # To test this method, we need to set specific values for @solution and
       # @guess, so we will create a new instance of NumberGame. When creating
       # another instance of NumberGame, we'll use a meaningful name to
@@ -70,9 +72,9 @@ describe NumberGame do
       # A helpful tip is to combine the purpose of the test and the object.
       # E.g., game_end or complete_game.
 
-      subject(:game_end) { described_class.new(5, "5") }
+      subject(:game_end) { described_class.new(5, '5') }
 
-      it "is game over" do
+      it 'is game over' do
         expect(game_end).to be_game_over
       end
     end
@@ -81,12 +83,12 @@ describe NumberGame do
 
     # Create a new instance of NumberGame and write a test for when the @guess
     # does not equal @solution.
-    context "when user guess is not correct" do
-      subject(:not_over) { described_class.new(5, "6") }
+    context 'when user guess is not correct' do
+      subject(:game_not_over) { described_class.new 5, '6' }
 
       # remove the 'x' before running this test
-      it "is not game over" do
-        expect(not_over).not_to be_game_over
+      it 'is not game over' do
+        expect(game_not_over).to_not be_game_over
       end
     end
   end
@@ -98,33 +100,32 @@ describe NumberGame do
 
   # Since we do not have to test #player_input, let's test #verify_input.
 
-  describe "#verify_input" do
+  describe '#verify_input' do
     subject(:game_check) { described_class.new }
-    # Note: #verify_input will only return a value if it matches /^[0-9]$/
+    # NOTE: #verify_input will only return a value if it matches /^[0-9]$/
 
-    context "when given a valid input as argument" do
-      it "returns valid input" do
-        user_input = "3"
+    context 'when given a valid input as argument' do
+      it 'returns valid input' do
+        user_input = '3'
         verified_input = game_check.verify_input(user_input)
-        expect(verified_input).to eq("3")
+        expect(verified_input).to eq('3')
       end
     end
 
     # ASSIGNMENT #3
 
     # Write a test for the following context.
-    context "when given invalid input as argument" do
-      it "returns nil" do
-        user_input = "hi"
+    context 'when given invalid input as argument' do
+      it 'returns nil' do
+        user_input = '100'
+        result = game_check.verify_input user_input
 
-        result = game_check.verify_input(user_input)
-
-        expect(result).to be nil
+        expect(result).to be_nil
       end
     end
   end
 
-  describe "#player_turn" do
+  describe '#player_turn' do
     # In order to test the behavior of #player_turn, we need to use a method
     # stub for #player_input to return a valid_input ('3'). To stub a method,
     # we 'allow' the test subject (game_loop) to receive the :method_name
@@ -135,22 +136,22 @@ describe NumberGame do
 
     subject(:game_loop) { described_class.new }
 
-    context "when user input is valid" do
+    context 'when user input is valid' do
       # To test the behavior, we want to test that the loop stops before the
       # puts 'Input error!' line. In order to test that this method is not
       # called, we use a message expectation.
       # https://rspec.info/features/3-12/rspec-mocks/
 
-      it "stops loop and does not display error message" do
-        valid_input = "3"
+      it 'stops loop and does not display error message' do
+        valid_input = '3'
         allow(game_loop).to receive(:player_input).and_return(valid_input)
         # To use a message expectation, move 'Assert' before 'Act'.
-        expect(game_loop).not_to receive(:puts).with("Input error!")
+        expect(game_loop).not_to receive(:puts).with('Input error!')
         game_loop.player_turn
       end
     end
 
-    context "when user inputs an incorrect value once, then a valid input" do
+    context 'when user inputs an incorrect value once, then a valid input' do
       # As the 'Arrange' step for tests grows, you can use a before hook to
       # separate the test from the set-up.
       # https://rspec.info/features/3-12/rspec-core/hooks/before-and-after-hooks/
@@ -161,16 +162,16 @@ describe NumberGame do
         # https://rspec.info/features/3-12/rspec-mocks/configuring-responses/returning-a-value/
         # This method stub for :player_input will return the invalid 'letter' input,
         # then it will return the 'valid_input'
-        letter = "d"
-        valid_input = "8"
+        letter = 'd'
+        valid_input = '8'
         allow(game_loop).to receive(:player_input).and_return(letter, valid_input)
       end
 
       # When using message expectations, you can specify how many times you
       # expect the message to be received.
       # https://rspec.info/features/3-12/rspec-mocks/setting-constraints/receive-counts/
-      it "completes loop and displays error message once" do
-        expect(game_loop).to receive(:puts).with("Input error!").once
+      it 'completes loop and displays error message once' do
+        expect(game_loop).to receive(:puts).with('Input error!').once
         game_loop.player_turn
       end
     end
@@ -178,16 +179,17 @@ describe NumberGame do
     # ASSIGNMENT #4
 
     # Write a test for the following context.
-    context "when user inputs two incorrect values, then a valid input" do
+    context 'when user inputs two incorrect values, then a valid input' do
       before do
-        first = "a"
-        second = "b"
-        third = "1"
-        allow(game_loop).to receive(:player_input).and_return(first, second, third)
+        bad_input1 = 'x'
+        bad_input2 = 'y'
+        valid_input = '5'
+
+        allow(game_loop).to receive(:player_input).and_return(bad_input1, bad_input2, valid_input)
       end
 
-      it "completes loop and displays error message twice" do
-        expect(game_loop).to receive(:puts).with("Input error!").twice
+      it 'completes loop and displays error message twice' do
+        expect(game_loop).to receive(:puts).with('Input error!').twice
 
         game_loop.player_turn
       end
@@ -202,13 +204,13 @@ describe NumberGame do
   # However, here is an example of how to test 'puts' using the output matcher.
   # https://rspec.info/features/3-12/rspec-expectations/built-in-matchers/output/
 
-  describe "#final_message" do
-    context "when count is 1" do
+  describe '#final_message' do
+    context 'when count is 1' do
       # To test this method, we need to set specific values for @solution,
       # @guess and @count, so we will create a new instance of NumberGame.
-      subject(:game_one) { described_class.new(5, "5", 1) }
+      subject(:game_one) { described_class.new(5, '5', 1) }
 
-      it "outputs correct phrase" do
+      it 'outputs correct phrase' do
         lucky_phrase = "LUCKY GUESS!\n"
         # The output matcher needs a block of code to assert.
         expect { game_one.final_message }.to output(lucky_phrase).to_stdout
@@ -219,24 +221,28 @@ describe NumberGame do
 
     # Create a new instance of NumberGame, with specific values for @solution,
     # @guess, and @count
-    context "when count is 2-3" do
-      subject(:game_two) { described_class.new(5, "5", 3) }
+    context 'when count is 2-3' do
+      subject(:game_low) { described_class.new 5, '5', 3 }
+
       # remove the 'x' before running this test
-      it "outputs correct phrase" do
+      it 'outputs correct phrase' do
         congrats_phrase = "Congratulations! You picked the random number in 3 guesses!\n"
-        expect { game_two.final_message }.to output(congrats_phrase).to_stdout
+
+        expect { game_low.final_message }.to output(congrats_phrase).to_stdout
       end
     end
 
     # ASSIGNMENT #6
 
     # Write a test for the following context.
-    context "when count is 4 and over" do
-      subject(:game_three) { described_class.new(5, "5", 5) }
+    context 'when count is 4 and over' do
+      subject(:game_hard) { described_class.new 5, '5', 10 }
+
       # remove the 'x' before running this test
-      it "outputs correct phrase" do
-        fuck_you_phrase = "That was hard. It took you 5 guesses!\n"
-        expect { game_three.final_message }.to output(fuck_you_phrase).to_stdout
+      it 'outputs correct phrase' do
+        final_phrase = "That was hard. It took you 10 guesses!\n"
+
+        expect { game_hard.final_message }.to output(final_phrase).to_stdout
       end
     end
   end

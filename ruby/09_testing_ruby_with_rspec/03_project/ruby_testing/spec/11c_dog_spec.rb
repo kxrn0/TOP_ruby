@@ -35,20 +35,21 @@ end
 
 describe Dog do
   # Create a subject with your choice of dog name and optional breed/color.
-  subject(:cock) { described_class.new('Cock', nil, 'mocha') }
+  subject(:dog) { described_class.new 'god' }
+
   # Write a test using the second shared_example to test that dog responds to
   # talk ('WOOF!').
-  context 'responds to the method talk' do
+  context '' do
     include_examples 'shared method name'
   end
 
   # remove the 'x' before running this test
   it 'is not barking' do
-    expect(cock.barking?).to be false
+    expect(dog).to_not be_barking
   end
 
   # remove the 'x' before running this test
   it 'is sleeping' do
-    expect(cock.sleeping?).to be true
+    expect(dog).to be_sleeping
   end
 end
